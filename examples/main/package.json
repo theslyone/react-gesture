@@ -1,0 +1,6 @@
+{
+  "name": "react-gesture-main-example",
+  "dependencies": {
+    "react-dom": "^0.14.5"
+  }
+}
