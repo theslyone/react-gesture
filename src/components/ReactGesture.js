@@ -2,6 +2,8 @@ import * as React from 'react';
 import autobind from 'autobind-decorator';
 import { touchListMap, distance, getDirection, getXY } from '../utils/geture-calculations';
 
+const LINE_HEIGHT = 20;
+
 export class ReactGesture extends React.Component {
 
 	constructor(props) {
@@ -53,6 +55,8 @@ export class ReactGesture extends React.Component {
 		const absY = Math.abs(deltaY);
 		const duration = Date.now() - this.pseudoState.start;
 		const velocity = Math.sqrt(absX * absX + absY * absY) / duration;
+		const velocityX = absX / duration;
+		const velocityY = absY / duration;
 		const done = e.type === 'touchend';
 
 		e.gesture = {
@@ -61,6 +65,8 @@ export class ReactGesture extends React.Component {
 			absX,
 			absY,
 			velocity,
+			velocityX,
+			velocityY,
 			duration,
 			done,
 		};
@@ -226,12 +232,18 @@ export class ReactGesture extends React.Component {
 		const { deltaX, absX, deltaY, absY } = gestureDetails.gesture;
 		const direction = getDirection(deltaX, absX, deltaY, absY);
 
-		this.pseudoState.swiping = true;
+		if (!this.pseudoState.swiping) {
+			this.pseudoState.swiping = true;
+			this.pseudoState.swipingDirection = (absX > absY) ? 'x' : 'y';
+		}
 
-		gestureDetails.gesture.isFlick = gestureDetails.gesture.velocity > this.props.flickThreshold;
-		gestureDetails.gesture.type = `swipe${direction.toLowerCase()}`;
-		this._emitEvent(`onSwipe${direction}`, gestureDetails);
-		gestureDetails.preventDefault();
+		if ((this.pseudoState.swipingDirection === 'x' && absX > absY) ||
+			(this.pseudoState.swipingDirection === 'y' && absY > absX)) {
+			gestureDetails.gesture.isFlick = gestureDetails.gesture.velocity > this.props.flickThreshold;
+			gestureDetails.gesture.type = `swipe${direction.toLowerCase()}`;
+			this._emitEvent(`onSwipe${direction}`, gestureDetails);
+			gestureDetails.preventDefault();
+		}
 	}
 
 	_handleHoldGesture(e) {
@@ -245,7 +257,7 @@ export class ReactGesture extends React.Component {
 	@autobind
 	_handleWheel(e) {
 		const gestureDetails = this._getGestureDetails(e);
-		gestureDetails.gesture.scrollDelta = e.deltaY;
+		gestureDetails.gesture.scrollDelta = e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
 		this._emitEvent('onScroll', gestureDetails);
 		if (this.pseudoState.wheelTimer) {
 			clearTimeout(this.pseudoState.wheelTimer);
