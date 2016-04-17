@@ -20292,6 +20292,38 @@
 		return desc;
 	}
 	
+	var propTypes = {
+		onSwipeUp: React.PropTypes.func,
+		onSwipeDown: React.PropTypes.func,
+		onSwipeLeft: React.PropTypes.func,
+		onSwipeRight: React.PropTypes.func,
+		onTap: React.PropTypes.func,
+		onClick: React.PropTypes.func,
+		onHold: React.PropTypes.func,
+		onPinchToZoom: React.PropTypes.func,
+		onTouchStart: React.PropTypes.func,
+		onTouchMove: React.PropTypes.func,
+		onTouchCancel: React.PropTypes.func,
+		onTouchEnd: React.PropTypes.func,
+		onMouseDown: React.PropTypes.func,
+		onMouseMove: React.PropTypes.func,
+		onMouseUp: React.PropTypes.func,
+		onScroll: React.PropTypes.func,
+		onScrollEnd: React.PropTypes.func,
+		flickThreshold: React.PropTypes.number,
+		swipeThreshold: React.PropTypes.number,
+		holdTime: React.PropTypes.number,
+		scrollEndTimeout: React.PropTypes.number,
+		children: React.PropTypes.element
+	};
+	
+	var defaultProps = {
+		flickThreshold: 0.6,
+		swipeThreshold: 10,
+		holdTime: 400,
+		scrollEndTimeout: 200
+	};
+	
 	var LINE_HEIGHT = 20;
 	
 	var ReactGesture = exports.ReactGesture = (_class = function (_React$Component) {
@@ -20382,7 +20414,7 @@
 	
 				var holdTimer = this.pseudoState.holdTimer;
 				if (holdTimer === null) {
-					holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+					holdTimer = setTimeout(this._handleHoldGesture, this.props.holdTime, e);
 				}
 	
 				this.pseudoState = {
@@ -20416,7 +20448,9 @@
 						return;
 					}
 	
-					if (this.pseudoState.swiping || gestureDetails.gesture.absX > this.props.swipeThreshold || gestureDetails.gesture.absY > this.props.swipeThreshold) {
+					var gestureDetailsGesture = gestureDetails.gesture;
+					var swipeThreshold = this.props.swipeThreshold;
+					if (this.pseudoState.swiping || gestureDetailsGesture.absX > swipeThreshold || gestureDetailsGesture.absY > swipeThreshold) {
 						this._handleSwipeGesture(gestureDetails);
 						return;
 					}
@@ -20426,12 +20460,13 @@
 			key: '_handlePinch',
 			value: function _handlePinch(e) {
 				this.pseudoState.pinch = true;
-				var prevDist = (0, _getureCalculations.distance)(this.pseudoState.fingers);
+				var fingers = this.pseudoState.fingers;
+				var prevDist = (0, _getureCalculations.distance)(fingers);
 				var currDist = (0, _getureCalculations.distance)(e.touches, 'clientX', 'clientY');
 				var scale = currDist / prevDist;
 				var origin = {
-					x: (this.pseudoState.fingers[0].x + this.pseudoState.fingers[1].x) / 2,
-					y: (this.pseudoState.fingers[0].y + this.pseudoState.fingers[1].y) / 2
+					x: (fingers[0].x + fingers[1].x) / 2,
+					y: (fingers[0].y + fingers[1].y) / 2
 				};
 	
 				e.pinch = {
@@ -20478,7 +20513,7 @@
 			value: function _handleMouseDown(e) {
 				this._emitEvent('onMouseDown', e);
 	
-				var holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+				var holdTimer = setTimeout(this._handleHoldGesture, this.props.holdTime, e);
 	
 				this.pseudoState = {
 					start: Date.now(),
@@ -20552,7 +20587,8 @@
 		}, {
 			key: '_handleHoldGesture',
 			value: function _handleHoldGesture(e) {
-				if (!this.pseudoState.swiping && (!this.pseudoState.fingers || this.pseudoState.fingers.length === 1)) {
+				var fingers = this.pseudoState.fingers;
+				if (!this.pseudoState.swiping && (!fingers || fingers.length === 1)) {
 					this._emitEvent('onHold', e);
 				}
 			}
@@ -20565,7 +20601,7 @@
 				if (this.pseudoState.wheelTimer) {
 					clearTimeout(this.pseudoState.wheelTimer);
 				}
-				this.pseudoState.wheelTimer = setTimeout(this._handleScrollEnd.bind(this, gestureDetails), this.props.scrollEndTimeout);
+				this.pseudoState.wheelTimer = setTimeout(this._handleScrollEnd, this.props.scrollEndTimeout);
 			}
 		}, {
 			key: '_handleScrollEnd',
@@ -20578,7 +20614,6 @@
 			value: function render() {
 				var children = this.props.children;
 				var element = React.Children.only(children);
-	
 				return React.cloneElement(element, {
 					onTouchStart: this._handleTouchStart,
 					onTouchCancel: this._handleTouchCancel,
@@ -20588,39 +20623,10 @@
 		}]);
 	
 		return ReactGesture;
-	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, '_handleTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleWheel'), _class.prototype)), _class);
+	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, '_handleTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleScrollEnd'), _class.prototype)), _class);
 	
-	ReactGesture.propTypes = {
-		onSwipeUp: React.PropTypes.func,
-		onSwipeDown: React.PropTypes.func,
-		onSwipeLeft: React.PropTypes.func,
-		onSwipeRight: React.PropTypes.func,
-		onTap: React.PropTypes.func,
-		onClick: React.PropTypes.func,
-		onHold: React.PropTypes.func,
-		onPinchToZoom: React.PropTypes.func,
-		onTouchStart: React.PropTypes.func,
-		onTouchMove: React.PropTypes.func,
-		onTouchCancel: React.PropTypes.func,
-		onTouchEnd: React.PropTypes.func,
-		onMouseDown: React.PropTypes.func,
-		onMouseMove: React.PropTypes.func,
-		onMouseUp: React.PropTypes.func,
-		onScroll: React.PropTypes.func,
-		onScrollEnd: React.PropTypes.func,
-		flickThreshold: React.PropTypes.number,
-		swipeThreshold: React.PropTypes.number,
-		holdTime: React.PropTypes.number,
-		scrollEndTimeout: React.PropTypes.number,
-		children: React.PropTypes.element
-	};
-	
-	ReactGesture.defaultProps = {
-		flickThreshold: 0.6,
-		swipeThreshold: 10,
-		holdTime: 400,
-		scrollEndTimeout: 200
-	};
+	ReactGesture.propTypes = propTypes;
+	ReactGesture.defaultProps = defaultProps;
 
 /***/ },
 /* 168 */
@@ -20726,7 +20732,7 @@
 
 /***/ },
 /* 169 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20737,15 +20743,15 @@
 	exports.distance = distance;
 	exports.getDirection = getDirection;
 	exports.getXY = getXY;
-	function touchListMap(list, callback) {
-		// TouchList.map is not defined
-		// return list.map(listItem => callback(listItem));
-		var result = [];
 	
-		for (var i = 0, listLength = list.length; i < listLength; ++i) {
+	var _directionTypes = __webpack_require__(170);
+	
+	function touchListMap(list, callback) {
+		var result = [];
+		var listLength = list.length;
+		for (var i = 0; i < listLength; ++i) {
 			result.push(callback(list[i]));
 		}
-	
 		return result;
 	}
 	
@@ -20753,18 +20759,19 @@
 		var x = arguments.length <= 1 || arguments[1] === undefined ? 'x' : arguments[1];
 		var y = arguments.length <= 2 || arguments[2] === undefined ? 'y' : arguments[2];
 	
-		var dX = points[1][x] - points[0][x];
-		var dY = points[1][y] - points[0][y];
-	
+		var firstPoint = points[1];
+		var zeroPoint = points[0];
+		var dX = firstPoint[x] - zeroPoint[x];
+		var dY = firstPoint[y] - zeroPoint[y];
 		return Math.sqrt(dX * dX + dY * dY);
 	}
 	
 	function getDirectionX(deltaX) {
-		return deltaX < 0 ? 'Right' : 'Left';
+		return deltaX < 0 ? _directionTypes.Right : _directionTypes.Left;
 	}
 	
 	function getDirectionY(deltaY) {
-		return deltaY < 0 ? 'Down' : 'Up';
+		return deltaY < 0 ? _directionTypes.Down : _directionTypes.Up;
 	}
 	
 	function getDirection(deltaX, absX, deltaY, absY) {
@@ -20777,6 +20784,20 @@
 			y: touch.clientY
 		};
 	}
+
+/***/ },
+/* 170 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var Right = exports.Right = 'Right';
+	var Left = exports.Left = 'Left';
+	var Down = exports.Down = 'Down';
+	var Up = exports.Up = 'Up';
 
 /***/ }
 /******/ ]);

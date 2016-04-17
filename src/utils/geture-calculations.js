@@ -1,28 +1,28 @@
-export function touchListMap(list, callback) {
-	// TouchList.map is not defined
-	// return list.map(listItem => callback(listItem));
-	const result = [];
+import { Right, Down, Left, Up } from '../constants/direction-types';
 
-	for (let i = 0, listLength = list.length; i < listLength; ++i) {
+export function touchListMap(list, callback) {
+	const result = [];
+	const listLength = list.length;
+	for (let i = 0; i < listLength; ++i) {
 		result.push(callback(list[i]));
 	}
-
 	return result;
 }
 
 export function distance(points, x = 'x', y = 'y') {
-	const dX = points[1][x] - points[0][x];
-	const dY = points[1][y] - points[0][y];
-
+	const firstPoint = points[1];
+	const zeroPoint = points[0];
+	const dX = firstPoint[x] - zeroPoint[x];
+	const dY = firstPoint[y] - zeroPoint[y];
 	return Math.sqrt(dX * dX + dY * dY);
 }
 
 function getDirectionX(deltaX) {
-	return deltaX < 0 ? 'Right' : 'Left';
+	return deltaX < 0 ? Right : Left;
 }
 
 function getDirectionY(deltaY) {
-	return deltaY < 0 ? 'Down' : 'Up';
+	return deltaY < 0 ? Down : Up;
 }
 
 export function getDirection(deltaX, absX, deltaY, absY) {

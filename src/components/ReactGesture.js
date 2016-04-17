@@ -2,6 +2,38 @@ import * as React from 'react';
 import autobind from 'autobind-decorator';
 import { touchListMap, distance, getDirection, getXY } from '../utils/geture-calculations';
 
+const propTypes = {
+	onSwipeUp: React.PropTypes.func,
+	onSwipeDown: React.PropTypes.func,
+	onSwipeLeft: React.PropTypes.func,
+	onSwipeRight: React.PropTypes.func,
+	onTap: React.PropTypes.func,
+	onClick: React.PropTypes.func,
+	onHold: React.PropTypes.func,
+	onPinchToZoom: React.PropTypes.func,
+	onTouchStart: React.PropTypes.func,
+	onTouchMove: React.PropTypes.func,
+	onTouchCancel: React.PropTypes.func,
+	onTouchEnd: React.PropTypes.func,
+	onMouseDown: React.PropTypes.func,
+	onMouseMove: React.PropTypes.func,
+	onMouseUp: React.PropTypes.func,
+	onScroll: React.PropTypes.func,
+	onScrollEnd: React.PropTypes.func,
+	flickThreshold: React.PropTypes.number,
+	swipeThreshold: React.PropTypes.number,
+	holdTime: React.PropTypes.number,
+	scrollEndTimeout: React.PropTypes.number,
+	children: React.PropTypes.element,
+};
+
+const defaultProps = {
+	flickThreshold: 0.6,
+	swipeThreshold: 10,
+	holdTime: 400,
+	scrollEndTimeout: 200,
+};
+
 const LINE_HEIGHT = 20;
 
 export class ReactGesture extends React.Component {
@@ -80,7 +112,7 @@ export class ReactGesture extends React.Component {
 
 		let holdTimer = this.pseudoState.holdTimer;
 		if (holdTimer === null) {
-			holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+			holdTimer = setTimeout(this._handleHoldGesture, this.props.holdTime, e);
 		}
 
 		this.pseudoState = {
@@ -114,9 +146,11 @@ export class ReactGesture extends React.Component {
 				return;
 			}
 
+			const gestureDetailsGesture = gestureDetails.gesture;
+			const swipeThreshold = this.props.swipeThreshold;
 			if (this.pseudoState.swiping
-				|| gestureDetails.gesture.absX > this.props.swipeThreshold
-				|| gestureDetails.gesture.absY > this.props.swipeThreshold
+				|| gestureDetailsGesture.absX > swipeThreshold
+				|| gestureDetailsGesture.absY > swipeThreshold
 			) {
 				this._handleSwipeGesture(gestureDetails);
 				return;
@@ -126,12 +160,13 @@ export class ReactGesture extends React.Component {
 
 	_handlePinch(e) {
 		this.pseudoState.pinch = true;
-		const prevDist = distance(this.pseudoState.fingers);
+		const fingers = this.pseudoState.fingers;
+		const prevDist = distance(fingers);
 		const currDist = distance(e.touches, 'clientX', 'clientY');
 		const scale = currDist / prevDist;
 		const origin = {
-			x: (this.pseudoState.fingers[0].x + this.pseudoState.fingers[1].x) / 2,
-			y: (this.pseudoState.fingers[0].y + this.pseudoState.fingers[1].y) / 2,
+			x: (fingers[0].x + fingers[1].x) / 2,
+			y: (fingers[0].y + fingers[1].y) / 2,
 		};
 
 		e.pinch = {
@@ -177,7 +212,7 @@ export class ReactGesture extends React.Component {
 	_handleMouseDown(e) {
 		this._emitEvent('onMouseDown', e);
 
-		const holdTimer = setTimeout(this._handleHoldGesture.bind(this), this.props.holdTime, e);
+		const holdTimer = setTimeout(this._handleHoldGesture, this.props.holdTime, e);
 
 		this.pseudoState = {
 			start: Date.now(),
@@ -246,10 +281,10 @@ export class ReactGesture extends React.Component {
 		}
 	}
 
+	@autobind
 	_handleHoldGesture(e) {
-		if (!this.pseudoState.swiping &&
-			(!this.pseudoState.fingers || this.pseudoState.fingers.length === 1)
-		) {
+		const fingers = this.pseudoState.fingers;
+		if (!this.pseudoState.swiping && (!fingers || fingers.length === 1)) {
 			this._emitEvent('onHold', e);
 		}
 	}
@@ -262,12 +297,10 @@ export class ReactGesture extends React.Component {
 		if (this.pseudoState.wheelTimer) {
 			clearTimeout(this.pseudoState.wheelTimer);
 		}
-		this.pseudoState.wheelTimer = setTimeout(
-			this._handleScrollEnd.bind(this, gestureDetails),
-			this.props.scrollEndTimeout
-		);
+		this.pseudoState.wheelTimer = setTimeout(this._handleScrollEnd, this.props.scrollEndTimeout);
 	}
 
+	@autobind
 	_handleScrollEnd(e) {
 		this._emitEvent('onScrollEnd', e);
 		clearTimeout(this.pseudoState.wheelTimer);
@@ -276,7 +309,6 @@ export class ReactGesture extends React.Component {
 	render() {
 		const children = this.props.children;
 		const element = React.Children.only(children);
-
 		return React.cloneElement(element, {
 			onTouchStart: this._handleTouchStart,
 			onTouchCancel: this._handleTouchCancel,
@@ -285,34 +317,5 @@ export class ReactGesture extends React.Component {
 	}
 }
 
-ReactGesture.propTypes = {
-	onSwipeUp: React.PropTypes.func,
-	onSwipeDown: React.PropTypes.func,
-	onSwipeLeft: React.PropTypes.func,
-	onSwipeRight: React.PropTypes.func,
-	onTap: React.PropTypes.func,
-	onClick: React.PropTypes.func,
-	onHold: React.PropTypes.func,
-	onPinchToZoom: React.PropTypes.func,
-	onTouchStart: React.PropTypes.func,
-	onTouchMove: React.PropTypes.func,
-	onTouchCancel: React.PropTypes.func,
-	onTouchEnd: React.PropTypes.func,
-	onMouseDown: React.PropTypes.func,
-	onMouseMove: React.PropTypes.func,
-	onMouseUp: React.PropTypes.func,
-	onScroll: React.PropTypes.func,
-	onScrollEnd: React.PropTypes.func,
-	flickThreshold: React.PropTypes.number,
-	swipeThreshold: React.PropTypes.number,
-	holdTime: React.PropTypes.number,
-	scrollEndTimeout: React.PropTypes.number,
-	children: React.PropTypes.element,
-};
-
-ReactGesture.defaultProps = {
-	flickThreshold: 0.6,
-	swipeThreshold: 10,
-	holdTime: 400,
-	scrollEndTimeout: 200,
-};
+ReactGesture.propTypes = propTypes;
+ReactGesture.defaultProps = defaultProps;
