@@ -1,10 +1,17 @@
 import { Right, Down, Left, Up } from '../constants/direction-types';
 
-export function touchListMap(list, callback) {
+function getXY(touch) {
+	return {
+		x: touch.clientX,
+		y: touch.clientY,
+	};
+}
+
+export function touchListMap(list) {
 	const result = [];
 	const listLength = list.length;
 	for (let i = 0; i < listLength; ++i) {
-		result.push(callback(list[i]));
+		result.push(getXY(list[i]));
 	}
 	return result;
 }
@@ -27,11 +34,4 @@ function getDirectionY(deltaY) {
 
 export function getDirection(deltaX, absX, deltaY, absY) {
 	return (absX > absY) ? getDirectionX(deltaX) : getDirectionY(deltaY);
-}
-
-export function getXY(touch) {
-	return {
-		x: touch.clientX,
-		y: touch.clientY,
-	};
 }
