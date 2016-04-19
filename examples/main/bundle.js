@@ -20221,7 +20221,7 @@
 	
 	var _react = __webpack_require__(1);
 	
-	var React = _interopRequireWildcard(_react);
+	var _react2 = _interopRequireDefault(_react);
 	
 	var _autobindDecorator = __webpack_require__(168);
 	
@@ -20229,20 +20229,12 @@
 	
 	var _getureCalculations = __webpack_require__(169);
 	
+	var _validations = __webpack_require__(171);
+	
+	var _event = __webpack_require__(172);
+	
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
-	}
-	
-	function _interopRequireWildcard(obj) {
-		if (obj && obj.__esModule) {
-			return obj;
-		} else {
-			var newObj = {};if (obj != null) {
-				for (var key in obj) {
-					if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-				}
-			}newObj.default = obj;return newObj;
-		}
 	}
 	
 	function _classCallCheck(instance, Constructor) {
@@ -20293,28 +20285,28 @@
 	}
 	
 	var propTypes = {
-		onSwipeUp: React.PropTypes.func,
-		onSwipeDown: React.PropTypes.func,
-		onSwipeLeft: React.PropTypes.func,
-		onSwipeRight: React.PropTypes.func,
-		onTap: React.PropTypes.func,
-		onClick: React.PropTypes.func,
-		onHold: React.PropTypes.func,
-		onPinchToZoom: React.PropTypes.func,
-		onTouchStart: React.PropTypes.func,
-		onTouchMove: React.PropTypes.func,
-		onTouchCancel: React.PropTypes.func,
-		onTouchEnd: React.PropTypes.func,
-		onMouseDown: React.PropTypes.func,
-		onMouseMove: React.PropTypes.func,
-		onMouseUp: React.PropTypes.func,
-		onScroll: React.PropTypes.func,
-		onScrollEnd: React.PropTypes.func,
-		flickThreshold: React.PropTypes.number,
-		swipeThreshold: React.PropTypes.number,
-		holdTime: React.PropTypes.number,
-		scrollEndTimeout: React.PropTypes.number,
-		children: React.PropTypes.element
+		onSwipeUp: _react2.default.PropTypes.func,
+		onSwipeDown: _react2.default.PropTypes.func,
+		onSwipeLeft: _react2.default.PropTypes.func,
+		onSwipeRight: _react2.default.PropTypes.func,
+		onTap: _react2.default.PropTypes.func,
+		onClick: _react2.default.PropTypes.func,
+		onHold: _react2.default.PropTypes.func,
+		onPinchToZoom: _react2.default.PropTypes.func,
+		onTouchStart: _react2.default.PropTypes.func,
+		onTouchMove: _react2.default.PropTypes.func,
+		onTouchCancel: _react2.default.PropTypes.func,
+		onTouchEnd: _react2.default.PropTypes.func,
+		onMouseDown: _react2.default.PropTypes.func,
+		onMouseMove: _react2.default.PropTypes.func,
+		onMouseUp: _react2.default.PropTypes.func,
+		onScroll: _react2.default.PropTypes.func,
+		onScrollEnd: _react2.default.PropTypes.func,
+		flickThreshold: _react2.default.PropTypes.number,
+		swipeThreshold: _react2.default.PropTypes.number,
+		holdTime: _react2.default.PropTypes.number,
+		scrollEndTimeout: _react2.default.PropTypes.number,
+		children: _react2.default.PropTypes.element
 	};
 	
 	var defaultProps = {
@@ -20323,8 +20315,6 @@
 		holdTime: 400,
 		scrollEndTimeout: 200
 	};
-	
-	var LINE_HEIGHT = 20;
 	
 	var ReactGesture = exports.ReactGesture = (_class = function (_React$Component) {
 		_inherits(ReactGesture, _React$Component);
@@ -20338,6 +20328,7 @@
 				x: null,
 				y: null,
 				swiping: false,
+				swipingDirection: undefined,
 				pinch: false,
 				start: 0,
 				holdTimer: null,
@@ -20345,285 +20336,396 @@
 				fingers: []
 			};
 	
-			window.addEventListener('mousemove', _this._handleMouseMove);
-			window.addEventListener('mouseup', _this._handleMouseUp);
-			window.addEventListener('touchmove', _this._handleTouchMove);
-			window.addEventListener('touchend', _this._handleTouchEnd);
-			window.addEventListener('wheel', _this._handleWheel);
+			window.addEventListener('mousemove', _this.onMouseMove);
+			window.addEventListener('mouseup', _this.onMouseUp);
+			window.addEventListener('touchmove', _this.onTouchMove);
+			window.addEventListener('touchend', _this.onTouchEnd);
+			window.addEventListener('wheel', _this.onWheel);
 			return _this;
 		}
 	
 		_createClass(ReactGesture, [{
-			key: '_resetState',
-			value: function _resetState() {
-				clearTimeout(this.pseudoState.holdTimer);
-				this.pseudoState = {
-					x: null,
-					y: null,
-					swiping: false,
-					pinch: false,
-					start: Number.POSITIVE_INFINITY,
-					holdTimer: null,
-					wheelTimer: null,
-					fingers: []
-				};
+			key: 'onTouchStart',
+			value: function onTouchStart(e) {
+				this.pseudoState = {};
+				this.emitEvent('onTouchStart', e);
+				this.setPSStartDateNow();
+				this.setPSHoldTimerInitIfNeed(e);
+				this.setPSPosCurrentTouchDown(e);
+				this.setPSPinch(false);
+				this.setPSSwiping(false);
+				this.setPSFingers(e);
+				e.preventDefault();
 			}
 		}, {
-			key: '_emitEvent',
-			value: function _emitEvent(name, e) {
-				if (this.props[name]) {
-					this.props[name](e);
+			key: 'onTouchMove',
+			value: function onTouchMove(e) {
+				e.preventDefault();
+				var eventWithGesture = this.getEventWithGesture(e);
+				this.emitEvent('onTouchMove', eventWithGesture);
+				var pseudoState = this.pseudoState;
+				// TODO: why?
+				if (pseudoState.x === null) {
+					return;
+				}
+				var isPinch = e.touches.length === 2;
+				if (isPinch) {
+					// TODO: why?
+					if (pseudoState.fingers.length === 2) {
+						this.handlePinch(e);
+					}
+					this.setPSFingers(e);
+					return;
+				}
+				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
+				if (this.isSwipeGesture(eventGesture)) {
+					this.handleSwipeGesture(eventWithGesture);
+					return;
 				}
 			}
 		}, {
-			key: '_getGestureDetails',
-			value: function _getGestureDetails(e) {
-				var _ref = e.changedTouches ? e.changedTouches[0] : e;
+			key: 'onTouchCancel',
+			value: function onTouchCancel(e) {
+				this.emitEvent('onTouchCancel', e);
+				this.resetState();
+			}
+		}, {
+			key: 'onTouchEnd',
+			value: function onTouchEnd(e) {
+				var eventWithGesture = this.getEventWithGesture(e);
+				this.emitEvent('onTouchEnd', eventWithGesture);
+				if (this.getPSSwiping()) {
+					this.handleSwipeGesture(eventWithGesture);
+					this.resetState();
+					return;
+				}
+				if (this.isTapGesture(eventWithGesture)) {
+					this.handleTapGesture(eventWithGesture);
+					this.resetState();
+					return;
+				}
+				this.resetState();
+			}
+		}, {
+			key: 'onMouseDown',
+			value: function onMouseDown(e) {
+				this.pseudoState = {};
+				this.emitEvent('onMouseDown', e);
+				this.setPSHoldTimerInit(e);
+				this.setPSStartDateNow();
+				this.setPSPosCurrentMouseDown(e);
+				this.setPSPinch(false);
+				this.setPSSwiping(false);
+			}
+		}, {
+			key: 'onMouseMove',
+			value: function onMouseMove(e) {
+				var eventWithGesture = this.getEventWithGesture(e);
+				this.emitEvent('onMouseMove', eventWithGesture);
+				var pseudoState = this.pseudoState;
+				var canBeGesture = pseudoState.x !== null && pseudoState.y !== null;
+				if (canBeGesture && this.isSwipeGesture((0, _event.getEventGesture)(eventWithGesture))) {
+					this.handleSwipeGesture(eventWithGesture);
+					return;
+				}
+			}
+		}, {
+			key: 'onMouseUp',
+			value: function onMouseUp(e) {
+				var eventWithGesture = this.getEventWithGesture(e);
+				this.emitEvent('onMouseUp', eventWithGesture);
+				if (this.getPSSwiping()) {
+					this.handleSwipeGesture(eventWithGesture);
+					this.resetState();
+					return;
+				}
+				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
+				if (eventGesture.duration > 0) {
+					this.handleClickGesture(eventWithGesture);
+					this.resetState();
+					return;
+				}
+				this.resetState();
+			}
+		}, {
+			key: 'onHoldGesture',
+			value: function onHoldGesture(e) {
+				var pseudoState = this.pseudoState;
+				var fingers = pseudoState.fingers;
+				if (!this.getPSSwiping() && (!fingers || fingers.length === 1)) {
+					this.emitEvent('onHold', e);
+				}
+			}
+		}, {
+			key: 'onWheel',
+			value: function onWheel(e) {
+				var eventWithGesture = this.getEventWithGesture(e);
+				(0, _event.setGestureScrollDelta)(eventWithGesture, e);
+				this.emitEvent('onScroll', eventWithGesture);
+				this.setPSWheelTimerClearIfNeed();
+				this.setPSWheelTimerInit();
+			}
+		}, {
+			key: 'onScrollEnd',
+			value: function onScrollEnd(e) {
+				this.emitEvent('onScrollEnd', e);
+				this.setPSWheelTimerClear();
+			}
+		}, {
+			key: 'getEventWithGesture',
+			value: function getEventWithGesture(e) {
+				var changedTouches = e.changedTouches;
+	
+				var _ref = changedTouches ? changedTouches[0] : e;
 	
 				var clientX = _ref.clientX;
 				var clientY = _ref.clientY;
 	
-				var deltaX = this.pseudoState.x - clientX;
-				var deltaY = this.pseudoState.y - clientY;
+				var pseudoState = this.pseudoState;
+				var deltaX = pseudoState.x - clientX;
+				var deltaY = pseudoState.y - clientY;
 				var absX = Math.abs(deltaX);
 				var absY = Math.abs(deltaY);
-				var duration = Date.now() - this.pseudoState.start;
+				var duration = Date.now() - pseudoState.start;
 				var velocity = Math.sqrt(absX * absX + absY * absY) / duration;
 				var velocityX = absX / duration;
 				var velocityY = absY / duration;
 				var done = e.type === 'touchend';
-	
-				e.gesture = {
-					deltaX: deltaX,
-					deltaY: deltaY,
-					absX: absX,
-					absY: absY,
-					velocity: velocity,
-					velocityX: velocityX,
-					velocityY: velocityY,
-					duration: duration,
-					done: done
-				};
-	
+				(0, _event.initGestureData)(e, deltaX, deltaY, absX, absY, velocity, velocityX, velocityY, duration, done);
 				return e;
 			}
 		}, {
-			key: '_handleTouchStart',
-			value: function _handleTouchStart(e) {
-				this._emitEvent('onTouchStart', e);
-	
-				var holdTimer = this.pseudoState.holdTimer;
+			key: 'getInitHoldTimer',
+			value: function getInitHoldTimer(e) {
+				return setTimeout(this.onHoldGesture, this.props.holdTime, e);
+			}
+		}, {
+			key: 'setGestureIsFlick',
+			value: function setGestureIsFlick(eventWithGesture) {
+				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
+				(0, _event.setEvGestureIsFlick)(eventGesture, eventGesture.velocity > this.props.flickThreshold);
+			}
+		}, {
+			key: 'setGestureDetailsPos',
+			value: function setGestureDetailsPos(eventWithGesture) {
+				var pseudoState = this.pseudoState;
+				(0, _event.setEvGestureDetailsPos)(eventWithGesture, pseudoState.x, pseudoState.y);
+			}
+		}, {
+			key: 'getPSSwiping',
+			value: function getPSSwiping() {
+				return this.pseudoState.swiping;
+			}
+		}, {
+			key: 'getPSSwipingDirection',
+			value: function getPSSwipingDirection() {
+				return this.pseudoState.swipingDirection;
+			}
+		}, {
+			key: 'setPSFingers',
+			value: function setPSFingers(e) {
+				this.pseudoState.fingers = (0, _getureCalculations.touchListMap)(e.touches);
+			}
+		}, {
+			key: 'setPSFingersEmpty',
+			value: function setPSFingersEmpty() {
+				this.pseudoState.fingers = [];
+			}
+		}, {
+			key: 'setPSHoldTimerInitIfNeed',
+			value: function setPSHoldTimerInitIfNeed(e) {
+				var pseudoState = this.pseudoState;
+				var holdTimer = pseudoState.holdTimer;
 				if (holdTimer === null) {
-					holdTimer = setTimeout(this._handleHoldGesture, this.props.holdTime, e);
+					holdTimer = this.getInitHoldTimer(e);
 				}
-	
-				this.pseudoState = {
-					start: Date.now(),
-					x: e.touches[0].clientX,
-					y: e.touches[0].clientY,
-					swiping: false,
-					pinch: false,
-					holdTimer: holdTimer,
-					fingers: (0, _getureCalculations.touchListMap)(e.touches, _getureCalculations.getXY)
-				};
-	
-				e.preventDefault();
+				pseudoState.holdTimer = holdTimer;
 			}
 		}, {
-			key: '_handleTouchMove',
-			value: function _handleTouchMove(e) {
-				e.preventDefault();
-				var gestureDetails = this._getGestureDetails(e);
-	
-				this._emitEvent('onTouchMove', gestureDetails);
-	
-				if (this.pseudoState.x !== null) {
-					if (e.touches.length === 2) {
-						if (this.pseudoState.fingers.length === 2) {
-							this._handlePinch(e);
-						}
-	
-						this.pseudoState.fingers = (0, _getureCalculations.touchListMap)(e.touches, _getureCalculations.getXY);
-	
-						return;
-					}
-	
-					var gestureDetailsGesture = gestureDetails.gesture;
-					var swipeThreshold = this.props.swipeThreshold;
-					if (this.pseudoState.swiping || gestureDetailsGesture.absX > swipeThreshold || gestureDetailsGesture.absY > swipeThreshold) {
-						this._handleSwipeGesture(gestureDetails);
-						return;
-					}
+			key: 'setPSHoldTimerClear',
+			value: function setPSHoldTimerClear() {
+				clearTimeout(this.pseudoState.holdTimer);
+			}
+		}, {
+			key: 'setPSHoldTimerInit',
+			value: function setPSHoldTimerInit(e) {
+				this.pseudoState.holdTimer = this.getInitHoldTimer(e);
+			}
+		}, {
+			key: 'setPSHoldTimerNull',
+			value: function setPSHoldTimerNull() {
+				this.pseudoState.holdTimer = null;
+			}
+		}, {
+			key: 'setPSStartDateNow',
+			value: function setPSStartDateNow() {
+				this.pseudoState.start = Date.now();
+			}
+		}, {
+			key: 'setPSStartInfinite',
+			value: function setPSStartInfinite() {
+				this.pseudoState.start = Number.POSITIVE_INFINITY;
+			}
+		}, {
+			key: 'setPSPinch',
+			value: function setPSPinch(pinch) {
+				this.pseudoState.pinch = pinch;
+			}
+		}, {
+			key: 'setPSPosEmpty',
+			value: function setPSPosEmpty() {
+				var pseudoState = this.pseudoState;
+				pseudoState.x = null;
+				pseudoState.y = null;
+			}
+		}, {
+			key: 'setPSPosCurrentMouseDown',
+			value: function setPSPosCurrentMouseDown(e) {
+				var pseudoState = this.pseudoState;
+				pseudoState.x = e.clientX;
+				pseudoState.y = e.clientY;
+			}
+		}, {
+			key: 'setPSPosCurrentTouchDown',
+			value: function setPSPosCurrentTouchDown(e) {
+				var pseudoState = this.pseudoState;
+				var touches = e.touches;
+				var firstTouche = touches[0];
+				pseudoState.x = firstTouche.clientX;
+				pseudoState.y = firstTouche.clientY;
+			}
+		}, {
+			key: 'setPSSwiping',
+			value: function setPSSwiping(swiping) {
+				this.pseudoState.swiping = swiping;
+			}
+		}, {
+			key: 'setPSSwipingDirection',
+			value: function setPSSwipingDirection(swipingDirection) {
+				this.pseudoState.swipingDirection = swipingDirection;
+			}
+		}, {
+			key: 'setPSWheelTimerInit',
+			value: function setPSWheelTimerInit() {
+				this.pseudoState.wheelTimer = setTimeout(this.onScrollEnd, this.props.scrollEndTimeout);
+			}
+		}, {
+			key: 'setPSWheelTimerClear',
+			value: function setPSWheelTimerClear() {
+				clearTimeout(this.pseudoState.wheelTimer);
+			}
+		}, {
+			key: 'setPSWheelTimerNull',
+			value: function setPSWheelTimerNull() {
+				this.pseudoState.wheelTimer = null;
+			}
+		}, {
+			key: 'setPSWheelTimerClearIfNeed',
+			value: function setPSWheelTimerClearIfNeed() {
+				var pseudoStateWheelTimer = this.pseudoState.wheelTimer;
+				if (pseudoStateWheelTimer) {
+					clearTimeout(pseudoStateWheelTimer);
 				}
 			}
 		}, {
-			key: '_handlePinch',
-			value: function _handlePinch(e) {
-				this.pseudoState.pinch = true;
-				var fingers = this.pseudoState.fingers;
+			key: 'handlePinch',
+			value: function handlePinch(e) {
+				this.setPSPinch(true);
+				var pseudoState = this.pseudoState;
+				var fingers = pseudoState.fingers;
 				var prevDist = (0, _getureCalculations.distance)(fingers);
 				var currDist = (0, _getureCalculations.distance)(e.touches, 'clientX', 'clientY');
 				var scale = currDist / prevDist;
+				var zeroFinger = fingers[0];
+				var firstFinger = fingers[1];
 				var origin = {
-					x: (fingers[0].x + fingers[1].x) / 2,
-					y: (fingers[0].y + fingers[1].y) / 2
+					x: (zeroFinger.x + firstFinger.x) / 2,
+					y: (zeroFinger.y + firstFinger.y) / 2
 				};
-	
-				e.pinch = {
-					scale: scale,
-					origin: origin
-				};
-	
-				this._emitEvent('onPinchToZoom', e);
+				(0, _event.setEventPinch)(e, scale, origin);
+				this.emitEvent('onPinchToZoom', e);
 			}
 		}, {
-			key: '_handleTouchCancel',
-			value: function _handleTouchCancel(e) {
-				this._emitEvent('onTouchCancel', e);
-				this._resetState();
+			key: 'handleTapGesture',
+			value: function handleTapGesture(eventWithGesture) {
+				(0, _event.setGestureType)(eventWithGesture, 'tap');
+				this.setGestureDetailsPos(eventWithGesture);
+				this.emitEvent('onTap', eventWithGesture);
 			}
 		}, {
-			key: '_handleTouchEnd',
-			value: function _handleTouchEnd(e) {
-				var ge = this._getGestureDetails(e);
-	
-				this._emitEvent('onTouchEnd', ge);
-	
-				if (this.pseudoState.swiping) {
-					this._handleSwipeGesture(ge);
-					this._resetState();
-					return;
-				}
-				if (!this.pseudoState.pinch && ge.gesture.duration > 0) {
-					this._handleTapGesture(ge);
-				}
-				this._resetState();
+			key: 'handleClickGesture',
+			value: function handleClickGesture(eventWithGesture) {
+				(0, _event.setGestureType)(eventWithGesture, 'click');
+				this.emitEvent('onClick', eventWithGesture);
 			}
 		}, {
-			key: '_handleTapGesture',
-			value: function _handleTapGesture(ge) {
-				ge.gesture.type = 'tap';
-				// no more fingers on the screen => no position
-				ge.clientX = this.pseudoState.x;
-				ge.clientY = this.pseudoState.y;
-				this._emitEvent('onTap', ge);
-			}
-		}, {
-			key: '_handleMouseDown',
-			value: function _handleMouseDown(e) {
-				this._emitEvent('onMouseDown', e);
-	
-				var holdTimer = setTimeout(this._handleHoldGesture, this.props.holdTime, e);
-	
-				this.pseudoState = {
-					start: Date.now(),
-					x: e.clientX,
-					y: e.clientY,
-					swiping: false,
-					pinch: false,
-					holdTimer: holdTimer
-				};
-			}
-		}, {
-			key: '_handleMouseMove',
-			value: function _handleMouseMove(e) {
-				var gestureDetails = this._getGestureDetails(e);
-	
-				this._emitEvent('onMouseMove', gestureDetails);
-	
-				if (this.pseudoState.x !== null && this.pseudoState.y !== null && (this.pseudoState.swiping || gestureDetails.gesture.absX > this.props.swipeThreshold || gestureDetails.gesture.absY > this.props.swipeThreshold)) {
-					this._handleSwipeGesture(gestureDetails);
-					return;
-				}
-			}
-		}, {
-			key: '_handleMouseUp',
-			value: function _handleMouseUp(e) {
-				var gestureDetails = this._getGestureDetails(e);
-	
-				this._emitEvent('onMouseUp', gestureDetails);
-	
-				if (this.pseudoState.swiping) {
-					this._handleSwipeGesture(gestureDetails);
-					this._resetState();
-					return;
-				}
-	
-				if (gestureDetails.gesture.duration > 0) {
-					this._handleClickGesture(gestureDetails);
-				}
-	
-				this._resetState();
-			}
-		}, {
-			key: '_handleClickGesture',
-			value: function _handleClickGesture(gestureDetails) {
-				gestureDetails.gesture.type = 'click';
-				this._emitEvent('onClick', gestureDetails);
-			}
-		}, {
-			key: '_handleSwipeGesture',
-			value: function _handleSwipeGesture(gestureDetails) {
-				var _gestureDetails$gestu = gestureDetails.gesture;
-				var deltaX = _gestureDetails$gestu.deltaX;
-				var absX = _gestureDetails$gestu.absX;
-				var deltaY = _gestureDetails$gestu.deltaY;
-				var absY = _gestureDetails$gestu.absY;
+			key: 'handleSwipeGesture',
+			value: function handleSwipeGesture(eventWithGesture) {
+				var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
+				var deltaX = eventGesture.deltaX;
+				var absX = eventGesture.absX;
+				var deltaY = eventGesture.deltaY;
+				var absY = eventGesture.absY;
 	
 				var direction = (0, _getureCalculations.getDirection)(deltaX, absX, deltaY, absY);
-	
-				if (!this.pseudoState.swiping) {
-					this.pseudoState.swiping = true;
-					this.pseudoState.swipingDirection = absX > absY ? 'x' : 'y';
+				if (!this.getPSSwiping()) {
+					this.setPSSwiping(true);
+					this.setPSSwipingDirection(absX > absY ? 'x' : 'y');
 				}
-	
-				if (this.pseudoState.swipingDirection === 'x' && absX > absY || this.pseudoState.swipingDirection === 'y' && absY > absX) {
-					gestureDetails.gesture.isFlick = gestureDetails.gesture.velocity > this.props.flickThreshold;
-					gestureDetails.gesture.type = 'swipe' + direction.toLowerCase();
-					this._emitEvent('onSwipe' + direction, gestureDetails);
-					gestureDetails.preventDefault();
-				}
-			}
-		}, {
-			key: '_handleHoldGesture',
-			value: function _handleHoldGesture(e) {
-				var fingers = this.pseudoState.fingers;
-				if (!this.pseudoState.swiping && (!fingers || fingers.length === 1)) {
-					this._emitEvent('onHold', e);
+				var swipingDirection = this.getPSSwipingDirection();
+				if ((0, _validations.isCorrectSwipe)(swipingDirection, absX, absY)) {
+					this.setGestureIsFlick(eventWithGesture);
+					(0, _event.setGestureType)(eventWithGesture, 'swipe' + direction.toLowerCase());
+					this.emitEvent('onSwipe' + direction, eventWithGesture);
+					eventWithGesture.preventDefault();
 				}
 			}
 		}, {
-			key: '_handleWheel',
-			value: function _handleWheel(e) {
-				var gestureDetails = this._getGestureDetails(e);
-				gestureDetails.gesture.scrollDelta = e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
-				this._emitEvent('onScroll', gestureDetails);
-				if (this.pseudoState.wheelTimer) {
-					clearTimeout(this.pseudoState.wheelTimer);
-				}
-				this.pseudoState.wheelTimer = setTimeout(this._handleScrollEnd, this.props.scrollEndTimeout);
+			key: 'isSwipeGesture',
+			value: function isSwipeGesture(eventWithGestureGesture) {
+				var swipeThreshold = this.props.swipeThreshold;
+				return this.getPSSwiping() || eventWithGestureGesture.absX > swipeThreshold || eventWithGestureGesture.absY > swipeThreshold;
 			}
 		}, {
-			key: '_handleScrollEnd',
-			value: function _handleScrollEnd(e) {
-				this._emitEvent('onScrollEnd', e);
-				clearTimeout(this.pseudoState.wheelTimer);
+			key: 'isTapGesture',
+			value: function isTapGesture(eventWithGesture) {
+				return !this.pseudoState.pinch && (0, _event.getEventGesture)(eventWithGesture).duration > 0;
+			}
+		}, {
+			key: 'resetState',
+			value: function resetState() {
+				this.pseudoState = {};
+				this.setPSHoldTimerClear();
+				this.setPSStartInfinite();
+				this.setPSHoldTimerNull();
+				this.setPSPosEmpty();
+				this.setPSFingersEmpty();
+				this.setPSWheelTimerNull();
+				this.setPSPinch(false);
+				this.setPSSwiping(false);
+			}
+		}, {
+			key: 'emitEvent',
+			value: function emitEvent(name, e) {
+				var eventMethod = this.props[name];
+				if (eventMethod) {
+					eventMethod(e);
+				}
 			}
 		}, {
 			key: 'render',
 			value: function render() {
-				var children = this.props.children;
-				var element = React.Children.only(children);
-				return React.cloneElement(element, {
-					onTouchStart: this._handleTouchStart,
-					onTouchCancel: this._handleTouchCancel,
-					onMouseDown: this._handleMouseDown
+				var element = _react2.default.Children.only(this.props.children);
+				return _react2.default.cloneElement(element, {
+					onTouchStart: this.onTouchStart,
+					onTouchCancel: this.onTouchCancel,
+					onMouseDown: this.onMouseDown
 				});
 			}
 		}]);
 	
 		return ReactGesture;
-	}(React.Component), (_applyDecoratedDescriptor(_class.prototype, '_handleTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_handleScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, '_handleScrollEnd'), _class.prototype)), _class);
+	}(_react2.default.Component), (_applyDecoratedDescriptor(_class.prototype, 'onTouchStart', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchStart'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchCancel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchCancel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onTouchEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onTouchEnd'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onHoldGesture', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onHoldGesture'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onWheel', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onWheel'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onScrollEnd', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'onScrollEnd'), _class.prototype)), _class);
 	
 	ReactGesture.propTypes = propTypes;
 	ReactGesture.defaultProps = defaultProps;
@@ -20742,15 +20844,21 @@
 	exports.touchListMap = touchListMap;
 	exports.distance = distance;
 	exports.getDirection = getDirection;
-	exports.getXY = getXY;
 	
 	var _directionTypes = __webpack_require__(170);
 	
-	function touchListMap(list, callback) {
+	function getXY(touch) {
+		return {
+			x: touch.clientX,
+			y: touch.clientY
+		};
+	}
+	
+	function touchListMap(list) {
 		var result = [];
 		var listLength = list.length;
 		for (var i = 0; i < listLength; ++i) {
-			result.push(callback(list[i]));
+			result.push(getXY(list[i]));
 		}
 		return result;
 	}
@@ -20777,13 +20885,6 @@
 	function getDirection(deltaX, absX, deltaY, absY) {
 		return absX > absY ? getDirectionX(deltaX) : getDirectionY(deltaY);
 	}
-	
-	function getXY(touch) {
-		return {
-			x: touch.clientX,
-			y: touch.clientY
-		};
-	}
 
 /***/ },
 /* 170 */
@@ -20798,6 +20899,85 @@
 	var Left = exports.Left = 'Left';
 	var Down = exports.Down = 'Down';
 	var Up = exports.Up = 'Up';
+
+/***/ },
+/* 171 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.isCorrectSwipe = isCorrectSwipe;
+	function isCorrectSwipe(swipingDirection, absX, absY) {
+		return swipingDirection === 'x' && absX > absY || swipingDirection === 'y' && absY > absX;
+	}
+
+/***/ },
+/* 172 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.initGestureData = initGestureData;
+	exports.getEventGesture = getEventGesture;
+	exports.setEventPinch = setEventPinch;
+	exports.setGestureType = setGestureType;
+	exports.setGestureScrollDelta = setGestureScrollDelta;
+	exports.setEvGestureDetailsPos = setEvGestureDetailsPos;
+	exports.setEvGestureIsFlick = setEvGestureIsFlick;
+	
+	var LINE_HEIGHT = 20;
+	
+	function getScrollDelta(e) {
+	  return e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
+	}
+	
+	function initGestureData(e, deltaX, deltaY, absX, absY, velocity, velocityX, velocityY, duration, done) {
+	  e.gesture = {
+	    deltaX: deltaX,
+	    deltaY: deltaY,
+	    absX: absX,
+	    absY: absY,
+	    velocity: velocity,
+	    velocityX: velocityX,
+	    velocityY: velocityY,
+	    duration: duration,
+	    done: done
+	  };
+	}
+	
+	function getEventGesture(e) {
+	  return e.gesture;
+	}
+	
+	function setEventPinch(e, scale, origin) {
+	  e.pinch = {
+	    scale: scale,
+	    origin: origin
+	  };
+	}
+	
+	function setGestureType(eventWithGesture, gestureType) {
+	  eventWithGesture.gesture.type = gestureType;
+	}
+	
+	function setGestureScrollDelta(eventWithGesture, e) {
+	  eventWithGesture.gesture.scrollDelta = getScrollDelta(e);
+	}
+	
+	function setEvGestureDetailsPos(eventWithGesture, clientX, clientY) {
+	  eventWithGesture.clientX = clientX;
+	  eventWithGesture.clientY = clientY;
+	}
+	
+	function setEvGestureIsFlick(eventGesture, isFlick) {
+	  eventGesture.isFlick = isFlick;
+	}
 
 /***/ }
 /******/ ]);
