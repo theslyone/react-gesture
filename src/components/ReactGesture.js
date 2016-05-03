@@ -65,12 +65,14 @@ export class ReactGesture extends React.Component {
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('touchmove', this.onTouchMove);
     window.addEventListener('touchend', this.onTouchEnd);
+    window.addEventListener('touchcancel', this.onTouchCancel);
     window.addEventListener('wheel', this.onWheel);
   }
 
   @autobind
   onTouchStart(e) {
-    this.pseudoState = {};
+    e.preventDefault();
+    this.setPSEmpty();
     this.emitEvent('onTouchStart', e);
     this.setPSStartDateNow();
     this.setPSHoldTimerInitIfNeed(e);
@@ -78,7 +80,6 @@ export class ReactGesture extends React.Component {
     this.setPSPinch(false);
     this.setPSSwiping(false);
     this.setPSFingers(e);
-    e.preventDefault();
   }
 
   @autobind
@@ -87,14 +88,13 @@ export class ReactGesture extends React.Component {
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onTouchMove', eventWithGesture);
     const pseudoState = this.pseudoState;
-    // TODO: why?
-    if (pseudoState.x === null) {
+    if (pseudoState.x === null || pseudoState.y === null) {
       return;
     }
     const isPinch = e.touches.length === 2;
+    const wasPinch = pseudoState.fingers.length === 2;
     if (isPinch) {
-      // TODO: why?
-      if (pseudoState.fingers.length === 2) {
+      if (wasPinch) {
         this.handlePinch(e);
       }
       this.setPSFingers(e);
@@ -132,7 +132,7 @@ export class ReactGesture extends React.Component {
 
   @autobind
   onMouseDown(e) {
-    this.pseudoState = {};
+    this.setPSEmpty();
     this.emitEvent('onMouseDown', e);
     this.setPSHoldTimerInit(e);
     this.setPSStartDateNow();
@@ -332,6 +332,10 @@ export class ReactGesture extends React.Component {
     }
   }
 
+  setPSEmpty() {
+    this.pseudoState = {};
+  }
+
   handlePinch(e) {
     this.setPSPinch(true);
     const pseudoState = this.pseudoState;
@@ -370,10 +374,10 @@ export class ReactGesture extends React.Component {
     }
     const swipingDirection = this.getPSSwipingDirection();
     if (isCorrectSwipe(swipingDirection, absX, absY)) {
+      eventWithGesture.preventDefault();
       this.setGestureIsFlick(eventWithGesture);
       setGestureType(eventWithGesture, `swipe${direction.toLowerCase()}`);
       this.emitEvent(`onSwipe${direction}`, eventWithGesture);
-      eventWithGesture.preventDefault();
     }
   }
 
@@ -390,7 +394,7 @@ export class ReactGesture extends React.Component {
   }
 
   resetState() {
-    this.pseudoState = {};
+    this.setPSEmpty();
     this.setPSHoldTimerClear();
     this.setPSStartInfinite();
     this.setPSHoldTimerNull();
@@ -412,7 +416,6 @@ export class ReactGesture extends React.Component {
     const element = React.Children.only(this.props.children);
     return React.cloneElement(element, {
       onTouchStart: this.onTouchStart,
-      onTouchCancel: this.onTouchCancel,
       onMouseDown: this.onMouseDown,
     });
   }

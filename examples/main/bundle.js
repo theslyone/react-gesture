@@ -20473,6 +20473,7 @@
 	    window.addEventListener('mouseup', _this.onMouseUp);
 	    window.addEventListener('touchmove', _this.onTouchMove);
 	    window.addEventListener('touchend', _this.onTouchEnd);
+	    window.addEventListener('touchcancel', _this.onTouchCancel);
 	    window.addEventListener('wheel', _this.onWheel);
 	    return _this;
 	  }
@@ -20480,7 +20481,8 @@
 	  _createClass(ReactGesture, [{
 	    key: 'onTouchStart',
 	    value: function onTouchStart(e) {
-	      this.pseudoState = {};
+	      e.preventDefault();
+	      this.setPSEmpty();
 	      this.emitEvent('onTouchStart', e);
 	      this.setPSStartDateNow();
 	      this.setPSHoldTimerInitIfNeed(e);
@@ -20488,7 +20490,6 @@
 	      this.setPSPinch(false);
 	      this.setPSSwiping(false);
 	      this.setPSFingers(e);
-	      e.preventDefault();
 	    }
 	  }, {
 	    key: 'onTouchMove',
@@ -20497,14 +20498,13 @@
 	      var eventWithGesture = this.getEventWithGesture(e);
 	      this.emitEvent('onTouchMove', eventWithGesture);
 	      var pseudoState = this.pseudoState;
-	      // TODO: why?
-	      if (pseudoState.x === null) {
+	      if (pseudoState.x === null || pseudoState.y === null) {
 	        return;
 	      }
 	      var isPinch = e.touches.length === 2;
+	      var wasPinch = pseudoState.fingers.length === 2;
 	      if (isPinch) {
-	        // TODO: why?
-	        if (pseudoState.fingers.length === 2) {
+	        if (wasPinch) {
 	          this.handlePinch(e);
 	        }
 	        this.setPSFingers(e);
@@ -20542,7 +20542,7 @@
 	  }, {
 	    key: 'onMouseDown',
 	    value: function onMouseDown(e) {
-	      this.pseudoState = {};
+	      this.setPSEmpty();
 	      this.emitEvent('onMouseDown', e);
 	      this.setPSHoldTimerInit(e);
 	      this.setPSStartDateNow();
@@ -20760,6 +20760,11 @@
 	      }
 	    }
 	  }, {
+	    key: 'setPSEmpty',
+	    value: function setPSEmpty() {
+	      this.pseudoState = {};
+	    }
+	  }, {
 	    key: 'handlePinch',
 	    value: function handlePinch(e) {
 	      this.setPSPinch(true);
@@ -20806,10 +20811,10 @@
 	      }
 	      var swipingDirection = this.getPSSwipingDirection();
 	      if ((0, _validations.isCorrectSwipe)(swipingDirection, absX, absY)) {
+	        eventWithGesture.preventDefault();
 	        this.setGestureIsFlick(eventWithGesture);
 	        (0, _event.setGestureType)(eventWithGesture, 'swipe' + direction.toLowerCase());
 	        this.emitEvent('onSwipe' + direction, eventWithGesture);
-	        eventWithGesture.preventDefault();
 	      }
 	    }
 	  }, {
@@ -20827,7 +20832,7 @@
 	  }, {
 	    key: 'resetState',
 	    value: function resetState() {
-	      this.pseudoState = {};
+	      this.setPSEmpty();
 	      this.setPSHoldTimerClear();
 	      this.setPSStartInfinite();
 	      this.setPSHoldTimerNull();
@@ -20851,7 +20856,6 @@
 	      var element = _react2.default.Children.only(this.props.children);
 	      return _react2.default.cloneElement(element, {
 	        onTouchStart: this.onTouchStart,
-	        onTouchCancel: this.onTouchCancel,
 	        onMouseDown: this.onMouseDown
 	      });
 	    }
