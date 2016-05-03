@@ -122,7 +122,7 @@ export class ReactGesture extends React.Component {
       this.resetState();
       return;
     }
-    if (this.isTapGesture(eventWithGesture)) {
+    if (this.isTapOrClickGesture(eventWithGesture)) {
       this.handleTapGesture(eventWithGesture);
       this.resetState();
       return;
@@ -162,8 +162,7 @@ export class ReactGesture extends React.Component {
       this.resetState();
       return;
     }
-    const eventGesture = getEventGesture(eventWithGesture);
-    if (eventGesture.duration > 0) {
+    if (this.isTapOrClickGesture(eventWithGesture)) {
       this.handleClickGesture(eventWithGesture);
       this.resetState();
       return;
@@ -256,7 +255,7 @@ export class ReactGesture extends React.Component {
   setPSHoldTimerInitIfNeed(e) {
     const pseudoState = this.pseudoState;
     let holdTimer = pseudoState.holdTimer;
-    if (holdTimer === null) {
+    if (holdTimer === null || holdTimer === undefined) {
       holdTimer = this.getInitHoldTimer(e);
     }
     pseudoState.holdTimer = holdTimer;
@@ -385,8 +384,9 @@ export class ReactGesture extends React.Component {
       || eventWithGestureGesture.absY > swipeThreshold;
   }
 
-  isTapGesture(eventWithGesture) {
-    return !this.pseudoState.pinch && getEventGesture(eventWithGesture).duration > 0;
+  isTapOrClickGesture(eventWithGesture) {
+    const duration = getEventGesture(eventWithGesture).duration;
+    return !this.pseudoState.pinch && duration > 0 && duration < this.props.holdTime;
   }
 
   resetState() {
