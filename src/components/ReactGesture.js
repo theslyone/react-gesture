@@ -48,7 +48,6 @@ export class ReactGesture extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.pseudoState = {
       x: null,
       y: null,
@@ -60,13 +59,24 @@ export class ReactGesture extends React.Component {
       wheelTimer: null,
       fingers: [],
     };
+  }
 
+  componentDidMount() {
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('touchmove', this.onTouchMove);
     window.addEventListener('touchend', this.onTouchEnd);
     window.addEventListener('touchcancel', this.onTouchCancel);
     window.addEventListener('wheel', this.onWheel);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('mouseup', this.onMouseUp);
+    window.removeEventListener('touchmove', this.onTouchMove);
+    window.removeEventListener('touchend', this.onTouchEnd);
+    window.removeEventListener('touchcancel', this.onTouchCancel);
+    window.removeEventListener('wheel', this.onWheel);
   }
 
   @autobind
