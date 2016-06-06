@@ -81,7 +81,6 @@ export class ReactGesture extends React.Component {
 
   @autobind
   onTouchStart(e) {
-    e.preventDefault();
     this.setPSEmpty();
     this.emitEvent('onTouchStart', e);
     this.setPSStartDateNow();
@@ -94,7 +93,6 @@ export class ReactGesture extends React.Component {
 
   @autobind
   onTouchMove(e) {
-    e.preventDefault();
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onTouchMove', eventWithGesture);
     const pseudoState = this.pseudoState;
