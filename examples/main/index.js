@@ -126,7 +126,7 @@ ReactDOM.render(
 					zoom.apply(e.pinch);
 				}}
 				>
-					<div>
+					<div onClick={() => console.log('dom click event')}>
 						<div style={ { height: '100px' } }>Block A</div>
 						<div style={ { height: '100px' } }>Block B</div>
 						<div style={ { height: '100px' } }>Block C</div>
