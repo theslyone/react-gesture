@@ -20483,6 +20483,7 @@
 	      window.addEventListener('touchend', this.onTouchEnd);
 	      window.addEventListener('touchcancel', this.onTouchCancel);
 	      window.addEventListener('wheel', this.onWheel);
+	      this.wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'componentWillUnmount',
@@ -20498,8 +20499,15 @@
 	  }, {
 	    key: 'onRef',
 	    value: function onRef(ref) {
+	      /* if we need to handle dom changes
+	      if (ref === null) {
+	        this.wrapper.removeEventListener('click', this.disableClick, true);
+	      } else {
+	        this.wrapper = ref;
+	        this.wrapper.addEventListener('click', this.disableClick, true);
+	      }
+	      */
 	      this.wrapper = ref;
-	      this.wrapper.addEventListener('click', this.disableClick, true);
 	    }
 	  }, {
 	    key: 'onTouchStart',
