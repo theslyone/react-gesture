@@ -1,7 +1,7 @@
 import React from 'react';
 import autobind from 'autobind-decorator';
 import { touchListMap, distance, getDirection } from '../utils/geture-calculations';
-import { isCorrectSwipe } from '../utils/validations';
+import { isCorrectSwipe, isFocused, isTextSelected } from '../utils/validations';
 import {
   initGestureData,
   getEventGesture,
@@ -106,6 +106,8 @@ export class ReactGesture extends React.Component {
     this.setPSSwiping(false);
     this.setPSFingers(e);
     this.setPSHold(false);
+    this.setPSTextSelection(false);
+    this.setBeginHandled(true);
   }
 
   @autobind
@@ -126,8 +128,7 @@ export class ReactGesture extends React.Component {
       this.setPSFingers(e);
       return;
     }
-    const eventGesture = getEventGesture(eventWithGesture);
-    if (this.isSwipeGesture(eventGesture)) {
+    if (this.isSwipeGesture(eventWithGesture)) {
       this.handleSwipeGesture(eventWithGesture);
       return;
     }
@@ -154,10 +155,15 @@ export class ReactGesture extends React.Component {
       return;
     }
     this.resetState();
+    this.setEndHandled(true);
   }
 
   @autobind
   onMouseDown(e) {
+    if (this.getBeginHandled()) {
+      this.setBeginHandled(false);
+      return;
+    }
     this.setPSEmpty();
     this.emitEvent('onMouseDown', e);
     this.setPSHoldTimerInit(e);
@@ -166,6 +172,7 @@ export class ReactGesture extends React.Component {
     this.setPSPinch(false);
     this.setPSSwiping(false);
     this.setPSHold(false);
+    this.setPSTextSelection(false);
   }
 
   @autobind
@@ -174,7 +181,7 @@ export class ReactGesture extends React.Component {
     this.emitEvent('onMouseMove', eventWithGesture);
     const pseudoState = this.pseudoState;
     const canBeGesture = pseudoState.x !== null && pseudoState.y !== null;
-    if (canBeGesture && this.isSwipeGesture(getEventGesture(eventWithGesture))) {
+    if (canBeGesture && this.isSwipeGesture(eventWithGesture)) {
       this.handleSwipeGesture(eventWithGesture);
       return;
     }
@@ -182,6 +189,10 @@ export class ReactGesture extends React.Component {
 
   @autobind
   onMouseUp(e) {
+    if (this.getEndHandled()) {
+      this.setEndHandled(false);
+      return;
+    }
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onMouseUp', eventWithGesture);
     if (this.getPSSwiping()) {
@@ -364,12 +375,36 @@ export class ReactGesture extends React.Component {
     return this.pseudoState.isHold;
   }
 
+  setPSTextSelection(isSelection) {
+    this.pseudoState.textSelection = isSelection;
+  }
+
+  getPSTextSelection() {
+    return this.pseudoState.textSelection;
+  }
+
   setPSHold(hold) {
     this.pseudoState.isHold = hold;
   }
 
   setPSEmpty() {
     this.pseudoState = {};
+  }
+
+  setBeginHandled(handled) {
+    this.beginHandled = handled;
+  }
+
+  getBeginHandled() {
+    return this.beginHandled;
+  }
+
+  setEndHandled(handled) {
+    this.endHandled = handled;
+  }
+
+  getEndHandled() {
+    return this.endHandled;
   }
 
   handlePinch(e) {
@@ -417,11 +452,25 @@ export class ReactGesture extends React.Component {
     }
   }
 
-  isSwipeGesture(eventWithGestureGesture) {
+  isTextSelectionGesture(eventWithGesture) {
+    if (this.getPSTextSelection()) {
+      return true;
+    }
+    const { target } = eventWithGesture;
+    const isSelectionGesture = isFocused(target) && isTextSelected(target);
+    if (isSelectionGesture) {
+      this.setPSTextSelection(true);
+    }
+    return isSelectionGesture;
+  }
+
+  isSwipeGesture(eventWithGesture) {
+    const eventGesture = getEventGesture(eventWithGesture);
     const swipeThreshold = this.props.swipeThreshold;
-    return this.getPSSwiping()
-      || eventWithGestureGesture.absX > swipeThreshold
-      || eventWithGestureGesture.absY > swipeThreshold;
+    return (this.getPSSwiping()
+      || eventGesture.absX > swipeThreshold
+      || eventGesture.absY > swipeThreshold)
+      && !this.isTextSelectionGesture(eventWithGesture);
   }
 
   isTapOrClickGesture(eventWithGesture) {
@@ -449,6 +498,7 @@ export class ReactGesture extends React.Component {
     this.setPSPinch(false);
     this.setPSSwiping(swipingBackup);
     this.setPSHold(holdBackup);
+    this.setPSTextSelection(false);
   }
 
   emitEvent(name, e) {

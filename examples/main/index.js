@@ -129,6 +129,7 @@ ReactDOM.render(
 					<div onClick={() => console.log('dom click event')}>
 						<div style={ { height: '100px' } }>Block A</div>
 						<div style={ { height: '100px' } }>Block B</div>
+						<input type="text" defaultValue="Some text to test selection" />
 						<div style={ { height: '100px' } }>Block C</div>
 					</div>
 				</ReactGesture>

@@ -216,6 +216,7 @@
 							{ style: { height: '100px' } },
 							'Block B'
 						),
+						React.createElement('input', { type: 'text', defaultValue: 'Some text to test selection' }),
 						React.createElement(
 							'div',
 							{ style: { height: '100px' } },
@@ -20521,6 +20522,8 @@
 	      this.setPSSwiping(false);
 	      this.setPSFingers(e);
 	      this.setPSHold(false);
+	      this.setPSTextSelection(false);
+	      this.setBeginHandled(true);
 	    }
 	  }, {
 	    key: 'onTouchMove',
@@ -20540,8 +20543,7 @@
 	        this.setPSFingers(e);
 	        return;
 	      }
-	      var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
-	      if (this.isSwipeGesture(eventGesture)) {
+	      if (this.isSwipeGesture(eventWithGesture)) {
 	        this.handleSwipeGesture(eventWithGesture);
 	        return;
 	      }
@@ -20568,10 +20570,15 @@
 	        return;
 	      }
 	      this.resetState();
+	      this.setEndHandled(true);
 	    }
 	  }, {
 	    key: 'onMouseDown',
 	    value: function onMouseDown(e) {
+	      if (this.getBeginHandled()) {
+	        this.setBeginHandled(false);
+	        return;
+	      }
 	      this.setPSEmpty();
 	      this.emitEvent('onMouseDown', e);
 	      this.setPSHoldTimerInit(e);
@@ -20580,6 +20587,7 @@
 	      this.setPSPinch(false);
 	      this.setPSSwiping(false);
 	      this.setPSHold(false);
+	      this.setPSTextSelection(false);
 	    }
 	  }, {
 	    key: 'onMouseMove',
@@ -20588,7 +20596,7 @@
 	      this.emitEvent('onMouseMove', eventWithGesture);
 	      var pseudoState = this.pseudoState;
 	      var canBeGesture = pseudoState.x !== null && pseudoState.y !== null;
-	      if (canBeGesture && this.isSwipeGesture((0, _event.getEventGesture)(eventWithGesture))) {
+	      if (canBeGesture && this.isSwipeGesture(eventWithGesture)) {
 	        this.handleSwipeGesture(eventWithGesture);
 	        return;
 	      }
@@ -20596,6 +20604,10 @@
 	  }, {
 	    key: 'onMouseUp',
 	    value: function onMouseUp(e) {
+	      if (this.getEndHandled()) {
+	        this.setEndHandled(false);
+	        return;
+	      }
 	      var eventWithGesture = this.getEventWithGesture(e);
 	      this.emitEvent('onMouseUp', eventWithGesture);
 	      if (this.getPSSwiping()) {
@@ -20797,6 +20809,16 @@
 	      return this.pseudoState.isHold;
 	    }
 	  }, {
+	    key: 'setPSTextSelection',
+	    value: function setPSTextSelection(isSelection) {
+	      this.pseudoState.textSelection = isSelection;
+	    }
+	  }, {
+	    key: 'getPSTextSelection',
+	    value: function getPSTextSelection() {
+	      return this.pseudoState.textSelection;
+	    }
+	  }, {
 	    key: 'setPSHold',
 	    value: function setPSHold(hold) {
 	      this.pseudoState.isHold = hold;
@@ -20805,6 +20827,26 @@
 	    key: 'setPSEmpty',
 	    value: function setPSEmpty() {
 	      this.pseudoState = {};
+	    }
+	  }, {
+	    key: 'setBeginHandled',
+	    value: function setBeginHandled(handled) {
+	      this.beginHandled = handled;
+	    }
+	  }, {
+	    key: 'getBeginHandled',
+	    value: function getBeginHandled() {
+	      return this.beginHandled;
+	    }
+	  }, {
+	    key: 'setEndHandled',
+	    value: function setEndHandled(handled) {
+	      this.endHandled = handled;
+	    }
+	  }, {
+	    key: 'getEndHandled',
+	    value: function getEndHandled() {
+	      return this.endHandled;
 	    }
 	  }, {
 	    key: 'handlePinch',
@@ -20860,10 +20902,25 @@
 	      }
 	    }
 	  }, {
+	    key: 'isTextSelectionGesture',
+	    value: function isTextSelectionGesture(eventWithGesture) {
+	      if (this.getPSTextSelection()) {
+	        return true;
+	      }
+	      var target = eventWithGesture.target;
+	
+	      var isSelectionGesture = (0, _validations.isFocused)(target) && (0, _validations.isTextSelected)(target);
+	      if (isSelectionGesture) {
+	        this.setPSTextSelection(true);
+	      }
+	      return isSelectionGesture;
+	    }
+	  }, {
 	    key: 'isSwipeGesture',
-	    value: function isSwipeGesture(eventWithGestureGesture) {
+	    value: function isSwipeGesture(eventWithGesture) {
+	      var eventGesture = (0, _event.getEventGesture)(eventWithGesture);
 	      var swipeThreshold = this.props.swipeThreshold;
-	      return this.getPSSwiping() || eventWithGestureGesture.absX > swipeThreshold || eventWithGestureGesture.absY > swipeThreshold;
+	      return (this.getPSSwiping() || eventGesture.absX > swipeThreshold || eventGesture.absY > swipeThreshold) && !this.isTextSelectionGesture(eventWithGesture);
 	    }
 	  }, {
 	    key: 'isTapOrClickGesture',
@@ -20893,6 +20950,7 @@
 	      this.setPSPinch(false);
 	      this.setPSSwiping(swipingBackup);
 	      this.setPSHold(holdBackup);
+	      this.setPSTextSelection(false);
 	    }
 	  }, {
 	    key: 'emitEvent',
@@ -21100,8 +21158,21 @@
 	  value: true
 	});
 	exports.isCorrectSwipe = isCorrectSwipe;
+	exports.isFocused = isFocused;
+	exports.isTextSelected = isTextSelected;
 	function isCorrectSwipe(swipingDirection, absX, absY) {
 	  return swipingDirection === 'x' && absX > absY || swipingDirection === 'y' && absY > absX;
+	}
+	
+	function isFocused(element) {
+	  return document.activeElement === element;
+	}
+	
+	function isTextSelected(element) {
+	  if (element.selectionStart === undefined) {
+	    return false;
+	  }
+	  return element.selectionStart !== element.selectionEnd;
 	}
 
 /***/ },
