@@ -34,6 +34,12 @@ const propTypes = {
   swipeThreshold: React.PropTypes.number,
   holdTime: React.PropTypes.number,
   scrollEndTimeout: React.PropTypes.number,
+  disableClick: React.PropTypes.oneOfType([
+    React.PropTypes.bool,
+    React.PropTypes.func, // (e) => bool
+  ]), // true: always disable
+      // false: never disable
+      // undefined: use internal logic
   children: React.PropTypes.element,
 };
 
@@ -108,6 +114,7 @@ export class ReactGesture extends React.Component {
     this.setPSHold(false);
     this.setPSTextSelection(false);
     this.setBeginHandled(true);
+    this.touch = true;
   }
 
   @autobind
@@ -144,18 +151,13 @@ export class ReactGesture extends React.Component {
   onTouchEnd(e) {
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onTouchEnd', eventWithGesture);
+    this.setEndHandled(true);
     if (this.getPSSwiping()) {
       this.handleSwipeGesture(eventWithGesture);
       this.resetState();
       return;
     }
-    if (this.isTapOrClickGesture(eventWithGesture)) {
-      this.handleTapGesture(eventWithGesture);
-      this.resetState();
-      return;
-    }
     this.resetState();
-    this.setEndHandled(true);
   }
 
   @autobind
@@ -173,6 +175,7 @@ export class ReactGesture extends React.Component {
     this.setPSSwiping(false);
     this.setPSHold(false);
     this.setPSTextSelection(false);
+    this.touch = false;
   }
 
   @autobind
@@ -197,11 +200,6 @@ export class ReactGesture extends React.Component {
     this.emitEvent('onMouseUp', eventWithGesture);
     if (this.getPSSwiping()) {
       this.handleSwipeGesture(eventWithGesture);
-      this.resetState();
-      return;
-    }
-    if (this.isTapOrClickGesture(eventWithGesture)) {
-      this.handleClickGesture(eventWithGesture);
       this.resetState();
       return;
     }
@@ -233,6 +231,12 @@ export class ReactGesture extends React.Component {
     this.setPSWheelTimerClear();
   }
 
+  @autobind
+  onClick(e) {
+    const type = this.touch ? 'onTap' : 'onClick';
+    this.emitEvent(type, e);
+  }
+
   getEventWithGesture(e) {
     const changedTouches = e.changedTouches;
     const { clientX, clientY } = changedTouches ? changedTouches[0] : e;
@@ -245,7 +249,7 @@ export class ReactGesture extends React.Component {
     const velocity = Math.sqrt(absX * absX + absY * absY) / duration;
     const velocityX = absX / duration;
     const velocityY = absY / duration;
-    const done = e.type === 'touchend';
+    const done = e.type === 'touchend' || e.type === 'mouseup';
     initGestureData(
       e,
       deltaX,
@@ -424,17 +428,6 @@ export class ReactGesture extends React.Component {
     this.emitEvent('onPinchToZoom', e);
   }
 
-  handleTapGesture(eventWithGesture) {
-    setGestureType(eventWithGesture, 'tap');
-    this.setGestureDetailsPos(eventWithGesture);
-    this.emitEvent('onTap', eventWithGesture);
-  }
-
-  handleClickGesture(eventWithGesture) {
-    setGestureType(eventWithGesture, 'click');
-    this.emitEvent('onClick', eventWithGesture);
-  }
-
   handleSwipeGesture(eventWithGesture) {
     const eventGesture = getEventGesture(eventWithGesture);
     const { deltaX, absX, deltaY, absY } = eventGesture;
@@ -473,16 +466,20 @@ export class ReactGesture extends React.Component {
       && !this.isTextSelectionGesture(eventWithGesture);
   }
 
-  isTapOrClickGesture(eventWithGesture) {
-    const duration = getEventGesture(eventWithGesture).duration;
-    return !this.pseudoState.pinch && duration > 0 && duration < this.props.holdTime;
-  }
-
   @autobind
   disableClick(e) {
-    if (this.getPSSwiping() || this.getPSHold()) {
-      e.stopPropagation();
+    const { disableClick } = this.props;
+    const disable = typeof disableClick === 'function' ?
+      disableClick(e) : disableClick;
+
+    if (disable === false) {
+      return;
     }
+    if (disable === undefined &&
+      !this.getPSSwiping() && !this.getPSHold()) {
+      return;
+    }
+    e.stopImmediatePropagation();
   }
 
   resetState() {
@@ -514,6 +511,7 @@ export class ReactGesture extends React.Component {
       ref: this.onRef,
       onTouchStart: this.onTouchStart,
       onMouseDown: this.onMouseDown,
+      onClick: this.onClick,
     });
   }
 }
