@@ -20370,6 +20370,22 @@
 	
 	var _event = __webpack_require__(174);
 	
+	var _buttons = __webpack_require__(175);
+	
+	var Buttons = _interopRequireWildcard(_buttons);
+	
+	function _interopRequireWildcard(obj) {
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }newObj.default = obj;return newObj;
+	  }
+	}
+	
 	function _interopRequireDefault(obj) {
 	  return obj && obj.__esModule ? obj : { default: obj };
 	}
@@ -20582,7 +20598,7 @@
 	      }
 	      this.setPSEmpty();
 	      this.emitEvent('onMouseDown', e);
-	      this.setPSHoldTimerInit(e);
+	      this.setPSHoldTimerInitIfNeed(e);
 	      this.setPSStartDateNow();
 	      this.setPSPosCurrentMouseDown(e);
 	      this.setPSPinch(false);
@@ -20715,7 +20731,7 @@
 	    value: function setPSHoldTimerInitIfNeed(e) {
 	      var pseudoState = this.pseudoState;
 	      var holdTimer = pseudoState.holdTimer;
-	      if (holdTimer === null || holdTimer === undefined) {
+	      if ((holdTimer === null || holdTimer === undefined) && (e.button === Buttons.LEFT || e.button === undefined)) {
 	        holdTimer = this.getInitHoldTimer(e);
 	      }
 	      pseudoState.holdTimer = holdTimer;
@@ -21232,6 +21248,21 @@
 	function setEvGestureIsFlick(eventGesture, isFlick) {
 	  eventGesture.isFlick = isFlick;
 	}
+
+/***/ },
+/* 175 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var LEFT = exports.LEFT = 0;
+	var MIDDLE = exports.MIDDLE = 1;
+	var RIGHT = exports.RIGHT = 2;
+	var BACK = exports.BACK = 3;
+	var FORWARD = exports.FORWARD = 4;
 
 /***/ }
 /******/ ]);

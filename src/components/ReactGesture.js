@@ -11,6 +11,7 @@ import {
   setEvGestureDetailsPos,
   setEvGestureIsFlick,
 } from '../utils/event';
+import * as Buttons from '../constants/buttons';
 
 const propTypes = {
   onSwipeUp: React.PropTypes.func,
@@ -168,7 +169,7 @@ export class ReactGesture extends React.Component {
     }
     this.setPSEmpty();
     this.emitEvent('onMouseDown', e);
-    this.setPSHoldTimerInit(e);
+    this.setPSHoldTimerInitIfNeed(e);
     this.setPSStartDateNow();
     this.setPSPosCurrentMouseDown(e);
     this.setPSPinch(false);
@@ -298,7 +299,8 @@ export class ReactGesture extends React.Component {
   setPSHoldTimerInitIfNeed(e) {
     const pseudoState = this.pseudoState;
     let holdTimer = pseudoState.holdTimer;
-    if (holdTimer === null || holdTimer === undefined) {
+    if ((holdTimer === null || holdTimer === undefined) &&
+      (e.button === Buttons.LEFT || e.button === undefined)) {
       holdTimer = this.getInitHoldTimer(e);
     }
     pseudoState.holdTimer = holdTimer;
