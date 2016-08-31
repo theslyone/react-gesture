@@ -35,7 +35,7 @@ prop               | type                  | default value
 `onMouseUp`        | `func`                |
 `onScroll`         | `func`                |
 `onScrollEnd`      | `func`                |
-`disableClick`     | `bool|func`           |
+`disableClick`     | `bool | func`         |
 `children`         | `element`             |
 `flickThreshold`   | `number`              | 0.6
 `holdTime`         | `number`              | 400
