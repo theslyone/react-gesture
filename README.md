@@ -14,6 +14,34 @@ Using [npm](https://www.npmjs.com/):
 npm install --save react-gesture
 ```
 
+### API
+
+prop               | type                  | default value
+-------------------|-----------------------|--------------
+`onSwipeUp`        | `func`                |
+`onSwipeDown`      | `func`                |
+`onSwipeLeft`      | `func`                |
+`onSwipeRight`     | `func`                |
+`onTap`            | `func`                |
+`onClick`          | `func`                |
+`onHold`           | `func`                |
+`onPinchToZoom`    | `func`                |
+`onTouchStart`     | `func`                |
+`onTouchMove`      | `func`                |
+`onTouchCancel`    | `func`                |
+`onTouchEnd`       | `func`                |
+`onMouseDown`      | `func`                |
+`onMouseMove`      | `func`                |
+`onMouseUp`        | `func`                |
+`onScroll`         | `func`                |
+`onScrollEnd`      | `func`                |
+`disableClick`     | `bool | func`         |
+`children`         | `element`             |
+`flickThreshold`   | `number`              | 0.6
+`holdTime`         | `number`              | 400
+`scrollEndTimeout` | `number`              | 200
+`swipeThreshold`   | `number`              | 10
+
 ### Examples
 
 * Main ([source](https://github.com/opensource-cards/react-gesture/tree/master/examples/main))
