@@ -21,7 +21,7 @@ export function distance(points, x = 'x', y = 'y') {
   const zeroPoint = points[0];
   const dX = firstPoint[x] - zeroPoint[x];
   const dY = firstPoint[y] - zeroPoint[y];
-  return Math.sqrt(dX * dX + dY * dY);
+  return Math.sqrt((dX * dX) + (dY * dY));
 }
 
 function getDirectionX(deltaX) {

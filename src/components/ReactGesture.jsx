@@ -1,5 +1,4 @@
 import React from 'react';
-import autobind from 'autobind-decorator';
 import { touchListMap, distance, getDirection } from '../utils/geture-calculations';
 import { isCorrectSwipe, isFocused, isTextSelected } from '../utils/validations';
 import {
@@ -37,10 +36,8 @@ const propTypes = {
   scrollEndTimeout: React.PropTypes.number,
   disableClick: React.PropTypes.oneOfType([
     React.PropTypes.bool,
-    React.PropTypes.func, // (e) => bool
-  ]), // true: always disable
-      // false: never disable
-      // undefined: use internal logic
+    React.PropTypes.func,
+  ]),
   children: React.PropTypes.element,
 };
 
@@ -51,7 +48,7 @@ const defaultProps = {
   scrollEndTimeout: 200,
 };
 
-export class ReactGesture extends React.Component {
+export default class ReactGesture extends React.Component {
 
   constructor(props) {
     super(props);
@@ -67,6 +64,19 @@ export class ReactGesture extends React.Component {
       fingers: [],
       isHold: false,
     };
+    this.onRef = this.onRef.bind(this);
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchCancel = this.onTouchCancel.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onHoldGesture = this.onHoldGesture.bind(this);
+    this.onWheel = this.onWheel.bind(this);
+    this.onScrollEnd = this.onScrollEnd.bind(this);
+    this.onClick = this.onClick.bind(this);
+    this.disableClick = this.disableClick.bind(this);
   }
 
   componentDidMount() {
@@ -89,7 +99,6 @@ export class ReactGesture extends React.Component {
     this.wrapper.removeEventListener('click', this.disableClick, true);
   }
 
-  @autobind
   onRef(ref) {
     /* if we need to handle dom changes
     if (ref === null) {
@@ -102,7 +111,6 @@ export class ReactGesture extends React.Component {
     this.wrapper = ref;
   }
 
-  @autobind
   onTouchStart(e) {
     this.setPSEmpty();
     this.emitEvent('onTouchStart', e);
@@ -118,7 +126,6 @@ export class ReactGesture extends React.Component {
     this.touch = true;
   }
 
-  @autobind
   onTouchMove(e) {
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onTouchMove', eventWithGesture);
@@ -142,13 +149,11 @@ export class ReactGesture extends React.Component {
     }
   }
 
-  @autobind
   onTouchCancel(e) {
     this.emitEvent('onTouchCancel', e);
     this.resetState();
   }
 
-  @autobind
   onTouchEnd(e) {
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onTouchEnd', eventWithGesture);
@@ -161,7 +166,6 @@ export class ReactGesture extends React.Component {
     this.resetState();
   }
 
-  @autobind
   onMouseDown(e) {
     if (this.getBeginHandled()) {
       this.setBeginHandled(false);
@@ -179,7 +183,6 @@ export class ReactGesture extends React.Component {
     this.touch = false;
   }
 
-  @autobind
   onMouseMove(e) {
     const eventWithGesture = this.getEventWithGesture(e);
     this.emitEvent('onMouseMove', eventWithGesture);
@@ -191,7 +194,6 @@ export class ReactGesture extends React.Component {
     }
   }
 
-  @autobind
   onMouseUp(e) {
     if (this.getEndHandled()) {
       this.setEndHandled(false);
@@ -207,7 +209,6 @@ export class ReactGesture extends React.Component {
     this.resetState();
   }
 
-  @autobind
   onHoldGesture(e) {
     const pseudoState = this.pseudoState;
     const fingers = pseudoState.fingers;
@@ -217,7 +218,6 @@ export class ReactGesture extends React.Component {
     }
   }
 
-  @autobind
   onWheel(e) {
     const eventWithGesture = this.getEventWithGesture(e);
     setGestureScrollDelta(eventWithGesture, e);
@@ -226,13 +226,11 @@ export class ReactGesture extends React.Component {
     this.setPSWheelTimerInit();
   }
 
-  @autobind
   onScrollEnd(e) {
     this.emitEvent('onScrollEnd', e);
     this.setPSWheelTimerClear();
   }
 
-  @autobind
   onClick(e) {
     const type = this.touch ? 'onTap' : 'onClick';
     this.emitEvent(type, e);
@@ -468,7 +466,6 @@ export class ReactGesture extends React.Component {
       && !this.isTextSelectionGesture(eventWithGesture);
   }
 
-  @autobind
   disableClick(e) {
     const { disableClick } = this.props;
     const disable = typeof disableClick === 'function' ?
