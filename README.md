@@ -11,7 +11,7 @@ A React component for defining gestures.
 Using [npm](https://www.npmjs.com/):
 
 ```
-npm install --save react-gesture
+npm install react-gesture --save
 ```
 
 ### API
