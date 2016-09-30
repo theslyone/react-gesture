@@ -3,6 +3,7 @@
 [![npm package](https://badge.fury.io/js/react-gesture.svg)](https://www.npmjs.org/package/react-gesture)
 [![Dependency Status](https://david-dm.org/opensource-cards/react-gesture.svg)](https://david-dm.org/opensource-cards/react-gesture)
 [![devDependency Status](https://david-dm.org/opensource-cards/react-gesture/dev-status.svg)](https://david-dm.org/opensource-cards/react-gesture#info=devDependencies)
+[![peerDependency Status](https://david-dm.org/opensource-cards/react-gesture/peer-status.svg)](https://david-dm.org/opensource-cards/react-gesture#info=peerDependencies)
 
 A React component for defining gestures.
 
