@@ -10,7 +10,7 @@ function getXY(touch) {
 export function touchListMap(list) {
   const result = [];
   const listLength = list.length;
-  for (let i = 0; i < listLength; ++i) {
+  for (let i = 0; i < listLength; i += 1) {
     result.push(getXY(list[i]));
   }
   return result;

@@ -7,6 +7,8 @@
 
 A React component for defining gestures.
 
+![](https://github.com/opensource-cards/react-gesture/blob/master/demo.gif)
+
 ### Installation
 
 Using [npm](https://www.npmjs.com/):
