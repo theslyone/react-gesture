@@ -232,8 +232,10 @@ export default class ReactGesture extends React.Component {
   }
 
   onClick(e) {
-    const type = this.touch ? 'onTap' : 'onClick';
-    this.emitEvent(type, e);
+    if (e.button === Buttons.LEFT || e.button === undefined) {
+      const type = this.touch ? 'onTap' : 'onClick';
+      this.emitEvent(type, e);
+    }
   }
 
   getEventWithGesture(e) {
@@ -460,10 +462,12 @@ export default class ReactGesture extends React.Component {
   isSwipeGesture(eventWithGesture) {
     const eventGesture = getEventGesture(eventWithGesture);
     const swipeThreshold = this.props.swipeThreshold;
-    return (this.getPSSwiping()
-      || eventGesture.absX > swipeThreshold
-      || eventGesture.absY > swipeThreshold)
-      && !this.isTextSelectionGesture(eventWithGesture);
+    return (eventWithGesture.button === Buttons.LEFT 
+        || eventWithGesture.button === undefined
+      ) && (this.getPSSwiping()
+        || eventGesture.absX > swipeThreshold
+        || eventGesture.absY > swipeThreshold
+      ) && !this.isTextSelectionGesture(eventWithGesture);
   }
 
   disableClick(e) {
