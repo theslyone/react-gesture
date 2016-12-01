@@ -1,6 +1,6 @@
 {
   "name": "react-gesture",
-  "version": "0.0.2-rc.11",
+  "version": "0.0.2-rc.12",
   "description": "A React component for defining gestures.",
   "keywords": [
     "react",
@@ -45,6 +45,8 @@
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.3.0",
     "rimraf": "^2.5.4",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1"
   }
