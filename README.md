@@ -37,13 +37,10 @@ prop               | type                  | default value
 `onMouseDown`      | `func`                |
 `onMouseMove`      | `func`                |
 `onMouseUp`        | `func`                |
-`onScroll`         | `func`                |
-`onScrollEnd`      | `func`                |
 `disableClick`     | `bool | func`         |
 `children`         | `element`             |
 `flickThreshold`   | `number`              | 0.6
 `holdTime`         | `number`              | 400
-`scrollEndTimeout` | `number`              | 200
 `swipeThreshold`   | `number`              | 10
 
 ### Examples

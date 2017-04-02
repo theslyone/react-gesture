@@ -6,7 +6,6 @@ import {
   getEventGesture,
   setEventPinch,
   setGestureType,
-  setGestureScrollDelta,
   setEvGestureDetailsPos,
   setEvGestureIsFlick,
 } from '../utils/event';
@@ -28,12 +27,9 @@ const propTypes = {
   onMouseDown: React.PropTypes.func,
   onMouseMove: React.PropTypes.func,
   onMouseUp: React.PropTypes.func,
-  onScroll: React.PropTypes.func,
-  onScrollEnd: React.PropTypes.func,
   flickThreshold: React.PropTypes.number,
   swipeThreshold: React.PropTypes.number,
   holdTime: React.PropTypes.number,
-  scrollEndTimeout: React.PropTypes.number,
   disableClick: React.PropTypes.oneOfType([
     React.PropTypes.bool,
     React.PropTypes.func,
@@ -45,7 +41,6 @@ const defaultProps = {
   flickThreshold: 0.6,
   swipeThreshold: 10,
   holdTime: 400,
-  scrollEndTimeout: 200,
 };
 
 export default class ReactGesture extends React.Component {
@@ -60,7 +55,6 @@ export default class ReactGesture extends React.Component {
       pinch: false,
       start: 0,
       holdTimer: null,
-      wheelTimer: null,
       fingers: [],
       isHold: false,
     };
@@ -73,8 +67,6 @@ export default class ReactGesture extends React.Component {
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onHoldGesture = this.onHoldGesture.bind(this);
-    this.onWheel = this.onWheel.bind(this);
-    this.onScrollEnd = this.onScrollEnd.bind(this);
     this.onClick = this.onClick.bind(this);
     this.disableClick = this.disableClick.bind(this);
   }
@@ -85,7 +77,6 @@ export default class ReactGesture extends React.Component {
     window.addEventListener('touchmove', this.onTouchMove);
     window.addEventListener('touchend', this.onTouchEnd);
     window.addEventListener('touchcancel', this.onTouchCancel);
-    window.addEventListener('wheel', this.onWheel);
     this.wrapper.addEventListener('click', this.disableClick, true);
   }
 
@@ -95,7 +86,6 @@ export default class ReactGesture extends React.Component {
     window.removeEventListener('touchmove', this.onTouchMove);
     window.removeEventListener('touchend', this.onTouchEnd);
     window.removeEventListener('touchcancel', this.onTouchCancel);
-    window.removeEventListener('wheel', this.onWheel);
     this.wrapper.removeEventListener('click', this.disableClick, true);
   }
 
@@ -216,19 +206,6 @@ export default class ReactGesture extends React.Component {
       this.emitEvent('onHold', e);
       this.setPSHold(true);
     }
-  }
-
-  onWheel(e) {
-    const eventWithGesture = this.getEventWithGesture(e);
-    setGestureScrollDelta(eventWithGesture, e);
-    this.emitEvent('onScroll', eventWithGesture);
-    this.setPSWheelTimerClearIfNeed();
-    this.setPSWheelTimerInit();
-  }
-
-  onScrollEnd(e) {
-    this.emitEvent('onScrollEnd', e);
-    this.setPSWheelTimerClear();
   }
 
   onClick(e) {
@@ -358,25 +335,6 @@ export default class ReactGesture extends React.Component {
     this.pseudoState.swipingDirection = swipingDirection;
   }
 
-  setPSWheelTimerInit() {
-    this.pseudoState.wheelTimer = setTimeout(this.onScrollEnd, this.props.scrollEndTimeout);
-  }
-
-  setPSWheelTimerClear() {
-    clearTimeout(this.pseudoState.wheelTimer);
-  }
-
-  setPSWheelTimerNull() {
-    this.pseudoState.wheelTimer = null;
-  }
-
-  setPSWheelTimerClearIfNeed() {
-    const pseudoStateWheelTimer = this.pseudoState.wheelTimer;
-    if (pseudoStateWheelTimer) {
-      clearTimeout(pseudoStateWheelTimer);
-    }
-  }
-
   getPSHold() {
     return this.pseudoState.isHold;
   }
@@ -494,7 +452,6 @@ export default class ReactGesture extends React.Component {
     this.setPSHoldTimerNull();
     this.setPSPosEmpty();
     this.setPSFingersEmpty();
-    this.setPSWheelTimerNull();
     this.setPSPinch(false);
     this.setPSSwiping(swipingBackup);
     this.setPSHold(holdBackup);

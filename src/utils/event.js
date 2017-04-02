@@ -1,10 +1,4 @@
 
-const LINE_HEIGHT = 20;
-
-function getScrollDelta(e) {
-  return e.deltaY * (e.deltaMode ? LINE_HEIGHT : 1);
-}
-
 export function initGestureData(
   e,
   deltaX,
@@ -43,10 +37,6 @@ export function setEventPinch(e, scale, origin) {
 
 export function setGestureType(eventWithGesture, gestureType) {
   eventWithGesture.gesture.type = gestureType;
-}
-
-export function setGestureScrollDelta(eventWithGesture, e) {
-  eventWithGesture.gesture.scrollDelta = getScrollDelta(e);
 }
 
 export function setEvGestureDetailsPos(eventWithGesture, clientX, clientY) {
