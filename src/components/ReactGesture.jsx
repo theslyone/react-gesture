@@ -1,5 +1,11 @@
+/* global window */
 import React from 'react';
-import { touchListMap, distance, getDirection } from '../utils/geture-calculations';
+import {
+  touchListMap,
+  getDistance,
+  getSwipeGestureName,
+  getSwipeEventName,
+} from '../utils/geture-calculations';
 import { isCorrectSwipe, isFocused, isTextSelected } from '../utils/validations';
 import {
   initGestureData,
@@ -12,6 +18,14 @@ import {
 import * as Buttons from '../constants/buttons';
 
 const propTypes = {
+  children: React.PropTypes.element,
+  disableClick: React.PropTypes.oneOfType([
+    React.PropTypes.bool,
+    React.PropTypes.func,
+  ]),
+  flickThreshold: React.PropTypes.number,
+  holdTime: React.PropTypes.number,
+  swipeThreshold: React.PropTypes.number,
   onSwipeUp: React.PropTypes.func,
   onSwipeDown: React.PropTypes.func,
   onSwipeLeft: React.PropTypes.func,
@@ -27,20 +41,27 @@ const propTypes = {
   onMouseDown: React.PropTypes.func,
   onMouseMove: React.PropTypes.func,
   onMouseUp: React.PropTypes.func,
-  flickThreshold: React.PropTypes.number,
-  swipeThreshold: React.PropTypes.number,
-  holdTime: React.PropTypes.number,
-  disableClick: React.PropTypes.oneOfType([
-    React.PropTypes.bool,
-    React.PropTypes.func,
-  ]),
-  children: React.PropTypes.element,
 };
 
 const defaultProps = {
   flickThreshold: 0.6,
-  swipeThreshold: 10,
   holdTime: 400,
+  swipeThreshold: 10,
+  onSwipeUp: undefined,
+  onSwipeDown: undefined,
+  onSwipeLeft: undefined,
+  onSwipeRight: undefined,
+  onTap: undefined,
+  onClick: undefined,
+  onHold: undefined,
+  onPinchToZoom: undefined,
+  onTouchStart: undefined,
+  onTouchMove: undefined,
+  onTouchCancel: undefined,
+  onTouchEnd: undefined,
+  onMouseDown: undefined,
+  onMouseMove: undefined,
+  onMouseUp: undefined,
 };
 
 export default class ReactGesture extends React.Component {
@@ -248,8 +269,8 @@ export default class ReactGesture extends React.Component {
   }
 
   setGestureIsFlick(eventWithGesture) {
-    const eventGesture = getEventGesture(eventWithGesture);
-    setEvGestureIsFlick(eventGesture, eventGesture.velocity > this.props.flickThreshold);
+    const eGesture = getEventGesture(eventWithGesture);
+    setEvGestureIsFlick(eGesture, eGesture.velocity > this.props.flickThreshold);
   }
 
   setGestureDetailsPos(eventWithGesture) {
@@ -375,8 +396,8 @@ export default class ReactGesture extends React.Component {
     this.setPSPinch(true);
     const pseudoState = this.pseudoState;
     const fingers = pseudoState.fingers;
-    const prevDist = distance(fingers);
-    const currDist = distance(e.touches, 'clientX', 'clientY');
+    const prevDist = getDistance(fingers, 'x', 'y');
+    const currDist = getDistance(e.touches, 'clientX', 'clientY');
     const scale = currDist / prevDist;
     const zeroFinger = fingers[0];
     const firstFinger = fingers[1];
@@ -389,19 +410,21 @@ export default class ReactGesture extends React.Component {
   }
 
   handleSwipeGesture(eventWithGesture) {
-    const eventGesture = getEventGesture(eventWithGesture);
-    const { deltaX, absX, deltaY, absY } = eventGesture;
-    const direction = getDirection(deltaX, absX, deltaY, absY);
+    const eGesture = getEventGesture(eventWithGesture);
+    const { deltaX, absX, deltaY, absY } = eGesture;
+    const swipeGestureName = getSwipeGestureName(deltaX, absX, deltaY, absY);
+    const swipeEventName = getSwipeEventName(deltaX, absX, deltaY, absY);
     if (!this.getPSSwiping()) {
       this.setPSSwiping(true);
       this.setPSSwipingDirection((absX > absY) ? 'x' : 'y');
     }
     const swipingDirection = this.getPSSwipingDirection();
     if (isCorrectSwipe(swipingDirection, absX, absY)) {
-      eventWithGesture.preventDefault();
+      // TODO: make sure it is not needed
+      // eventWithGesture.preventDefault();
       this.setGestureIsFlick(eventWithGesture);
-      setGestureType(eventWithGesture, `swipe${direction.toLowerCase()}`);
-      this.emitEvent(`onSwipe${direction}`, eventWithGesture);
+      setGestureType(eventWithGesture, swipeGestureName);
+      this.emitEvent(swipeEventName, eventWithGesture);
     }
   }
 
@@ -418,26 +441,22 @@ export default class ReactGesture extends React.Component {
   }
 
   isSwipeGesture(eventWithGesture) {
-    const eventGesture = getEventGesture(eventWithGesture);
+    const eGesture = getEventGesture(eventWithGesture);
     const swipeThreshold = this.props.swipeThreshold;
-    return (eventWithGesture.button === Buttons.LEFT 
-        || eventWithGesture.button === undefined
-      ) && (this.getPSSwiping()
-        || eventGesture.absX > swipeThreshold
-        || eventGesture.absY > swipeThreshold
-      ) && !this.isTextSelectionGesture(eventWithGesture);
+    return (
+      (eventWithGesture.button === Buttons.LEFT || eventWithGesture.button === undefined) &&
+      (this.getPSSwiping() || eGesture.absX > swipeThreshold || eGesture.absY > swipeThreshold) &&
+      !this.isTextSelectionGesture(eventWithGesture)
+    );
   }
 
   disableClick(e) {
     const { disableClick } = this.props;
-    const disable = typeof disableClick === 'function' ?
-      disableClick(e) : disableClick;
-
+    const disable = typeof disableClick === 'function' ? disableClick(e) : disableClick;
     if (disable === false) {
       return;
     }
-    if (disable === undefined &&
-      !this.getPSSwiping() && !this.getPSHold()) {
+    if (disable === undefined && !this.getPSSwiping() && !this.getPSHold()) {
       return;
     }
     e.stopImmediatePropagation();
@@ -466,8 +485,7 @@ export default class ReactGesture extends React.Component {
   }
 
   render() {
-    const element = React.Children.only(this.props.children);
-    return React.cloneElement(element, {
+    return React.cloneElement(React.Children.only(this.props.children), {
       ref: this.onRef,
       onTouchStart: this.onTouchStart,
       onMouseDown: this.onMouseDown,

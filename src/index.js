@@ -1,3 +1,1 @@
-import ReactGesture from './components/ReactGesture';
-
-export default ReactGesture;
+export { default } from './components/ReactGesture';

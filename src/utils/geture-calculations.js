@@ -1,4 +1,4 @@
-import { Right, Down, Left, Up } from '../constants/direction-types';
+import { RIGHT, DOWN, LEFT, UP } from '../constants/direction-types';
 
 function getXY(touch) {
   return {
@@ -8,15 +8,10 @@ function getXY(touch) {
 }
 
 export function touchListMap(list) {
-  const result = [];
-  const listLength = list.length;
-  for (let i = 0; i < listLength; i += 1) {
-    result.push(getXY(list[i]));
-  }
-  return result;
+  return list.map(item => getXY(item));
 }
 
-export function distance(points, x = 'x', y = 'y') {
+export function getDistance(points, x, y) {
   const firstPoint = points[1];
   const zeroPoint = points[0];
   const dX = firstPoint[x] - zeroPoint[x];
@@ -24,14 +19,22 @@ export function distance(points, x = 'x', y = 'y') {
   return Math.sqrt((dX * dX) + (dY * dY));
 }
 
-function getDirectionX(deltaX) {
-  return deltaX < 0 ? Right : Left;
+function getSwipeDirectionX(deltaX) {
+  return deltaX < 0 ? RIGHT : LEFT;
 }
 
-function getDirectionY(deltaY) {
-  return deltaY < 0 ? Down : Up;
+function getSwipeDirectionY(deltaY) {
+  return deltaY < 0 ? DOWN : UP;
 }
 
-export function getDirection(deltaX, absX, deltaY, absY) {
-  return (absX > absY) ? getDirectionX(deltaX) : getDirectionY(deltaY);
+function getSwipeDirection(deltaX, absX, deltaY, absY) {
+  return (absX > absY) ? getSwipeDirectionX(deltaX) : getSwipeDirectionY(deltaY);
+}
+
+export function getSwipeGestureName(deltaX, absX, deltaY, absY) {
+  return `swipe${getSwipeDirection(deltaX, absX, deltaY, absY).toLowerCase()}`;
+}
+
+export function getSwipeEventName(deltaX, absX, deltaY, absY) {
+  return `onSwipe${getSwipeDirection(deltaX, absX, deltaY, absY)}`;
 }

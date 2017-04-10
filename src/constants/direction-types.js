@@ -1,4 +1,5 @@
-export const Right = 'Right';
-export const Left = 'Left';
-export const Down = 'Down';
-export const Up = 'Up';
+
+export const RIGHT = 'Right';
+export const LEFT = 'Left';
+export const DOWN = 'Down';
+export const UP = 'Up';
