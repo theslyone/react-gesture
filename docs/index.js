@@ -1,4 +1,4 @@
-
+/* global document, window */
 import {
   BINARY_COLOR_SAND_80,
   BINARY_COLOR_SLATE_80,
