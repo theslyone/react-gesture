@@ -287,7 +287,9 @@ export default class ReactGesture extends React.Component {
   }
 
   setPSFingers(e) {
-    this.pseudoState.fingers = e.touches.map(touch => ({ x: touch.clientX, y: touch.clientY }));
+    this.pseudoState.fingers = Array.from(e.touches).map(
+      touch => ({ x: touch.clientX, y: touch.clientY })
+    );
   }
 
   setPSFingersEmpty() {

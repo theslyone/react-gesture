@@ -63,6 +63,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// only for test
+	/* global document, window */
 	var zoom = {
 	  scale: 1.0,
 	  origin: {
@@ -22414,7 +22415,7 @@
 	  }, {
 	    key: 'setPSFingers',
 	    value: function setPSFingers(e) {
-	      this.pseudoState.fingers = e.touches.map(function (touch) {
+	      this.pseudoState.fingers = Array.from(e.touches).map(function (touch) {
 	        return { x: touch.clientX, y: touch.clientY };
 	      });
 	    }
