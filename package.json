@@ -1,6 +1,6 @@
 {
   "name": "react-gesture",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A React component for defining gestures.",
   "keywords": [
     "react",
@@ -30,7 +30,8 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "react": "^15.3.2"
+    "prop-types": "^15.5.6",
+    "react": "^15.0.0"
   },
   "devDependencies": {
     "babel": "^6.3.26",
@@ -47,8 +48,9 @@
     "eslint-plugin-import": "^2.0.0",
     "eslint-plugin-jsx-a11y": "^2.2.2",
     "eslint-plugin-react": "^6.3.0",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
+    "prop-types": "^15.5.6",
+    "react": "^15.5.0",
+    "react-dom": "^15.5.0",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1"

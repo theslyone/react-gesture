@@ -1,1 +1,1 @@
-export { default } from './components/ReactGesture';
+export { default } from './component';

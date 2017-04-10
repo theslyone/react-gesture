@@ -1,11 +1,11 @@
 /* global window */
+import PropTypes from 'prop-types';
 import React from 'react';
 import {
-  touchListMap,
   getDistance,
   getSwipeGestureName,
   getSwipeEventName,
-} from '../utils/geture-calculations';
+} from '../utils/gesture-calculations';
 import { isCorrectSwipe, isFocused, isTextSelected } from '../utils/validations';
 import {
   initGestureData,
@@ -18,29 +18,29 @@ import {
 import * as Buttons from '../constants/buttons';
 
 const propTypes = {
-  children: React.PropTypes.element,
-  disableClick: React.PropTypes.oneOfType([
-    React.PropTypes.bool,
-    React.PropTypes.func,
+  children: PropTypes.element,
+  disableClick: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.func,
   ]),
-  flickThreshold: React.PropTypes.number,
-  holdTime: React.PropTypes.number,
-  swipeThreshold: React.PropTypes.number,
-  onSwipeUp: React.PropTypes.func,
-  onSwipeDown: React.PropTypes.func,
-  onSwipeLeft: React.PropTypes.func,
-  onSwipeRight: React.PropTypes.func,
-  onTap: React.PropTypes.func,
-  onClick: React.PropTypes.func,
-  onHold: React.PropTypes.func,
-  onPinchToZoom: React.PropTypes.func,
-  onTouchStart: React.PropTypes.func,
-  onTouchMove: React.PropTypes.func,
-  onTouchCancel: React.PropTypes.func,
-  onTouchEnd: React.PropTypes.func,
-  onMouseDown: React.PropTypes.func,
-  onMouseMove: React.PropTypes.func,
-  onMouseUp: React.PropTypes.func,
+  flickThreshold: PropTypes.number,
+  holdTime: PropTypes.number,
+  swipeThreshold: PropTypes.number,
+  onSwipeUp: PropTypes.func,
+  onSwipeDown: PropTypes.func,
+  onSwipeLeft: PropTypes.func,
+  onSwipeRight: PropTypes.func,
+  onTap: PropTypes.func,
+  onClick: PropTypes.func,
+  onHold: PropTypes.func,
+  onPinchToZoom: PropTypes.func,
+  onTouchStart: PropTypes.func,
+  onTouchMove: PropTypes.func,
+  onTouchCancel: PropTypes.func,
+  onTouchEnd: PropTypes.func,
+  onMouseDown: PropTypes.func,
+  onMouseMove: PropTypes.func,
+  onMouseUp: PropTypes.func,
 };
 
 const defaultProps = {
@@ -287,7 +287,7 @@ export default class ReactGesture extends React.Component {
   }
 
   setPSFingers(e) {
-    this.pseudoState.fingers = touchListMap(e.touches);
+    this.pseudoState.fingers = e.touches.map(touch => ({ x: touch.clientX, y: touch.clientY }));
   }
 
   setPSFingersEmpty() {

@@ -12,16 +12,19 @@ A gesture recognizer for web and mobile devices for React.
 
 ### Installation
 
-Using [npm](https://www.npmjs.com/):
-
 ```
-npm install react-gesture --save
+yarn add react-gesture
 ```
 
 ### API
 
 prop               | type                  | default value
 -------------------|-----------------------|--------------
+`children`         | `element`             |
+`disableClick`     | `bool | func`         |
+`flickThreshold`   | `number`              | 0.6
+`holdTime`         | `number`              | 400
+`swipeThreshold`   | `number`              | 10
 `onSwipeUp`        | `func`                |
 `onSwipeDown`      | `func`                |
 `onSwipeLeft`      | `func`                |
@@ -37,11 +40,6 @@ prop               | type                  | default value
 `onMouseDown`      | `func`                |
 `onMouseMove`      | `func`                |
 `onMouseUp`        | `func`                |
-`disableClick`     | `bool | func`         |
-`children`         | `element`             |
-`flickThreshold`   | `number`              | 0.6
-`holdTime`         | `number`              | 400
-`swipeThreshold`   | `number`              | 10
 
 ### Examples
 

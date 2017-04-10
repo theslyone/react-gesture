@@ -1,16 +1,5 @@
 import { RIGHT, DOWN, LEFT, UP } from '../constants/direction-types';
 
-function getXY(touch) {
-  return {
-    x: touch.clientX,
-    y: touch.clientY,
-  };
-}
-
-export function touchListMap(list) {
-  return list.map(item => getXY(item));
-}
-
 export function getDistance(points, x, y) {
   const firstPoint = points[1];
   const zeroPoint = points[0];
