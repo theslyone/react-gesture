@@ -310,10 +310,6 @@ export default class ReactGesture extends React.Component {
     clearTimeout(this.pseudoState.holdTimer);
   }
 
-  setPSHoldTimerInit(e) {
-    this.pseudoState.holdTimer = this.getInitHoldTimer(e);
-  }
-
   setPSHoldTimerNull() {
     this.pseudoState.holdTimer = null;
   }
