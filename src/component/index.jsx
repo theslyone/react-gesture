@@ -418,7 +418,6 @@ export default class ReactGesture extends React.Component {
     }
     const swipingDirection = this.getPSSwipingDirection();
     if (isCorrectSwipe(swipingDirection, absX, absY)) {
-      // TODO: make sure it is not needed
       // eventWithGesture.preventDefault();
       this.setGestureIsFlick(eventWithGesture);
       setGestureType(eventWithGesture, swipeGestureName);
