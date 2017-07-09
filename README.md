@@ -41,10 +41,6 @@ prop               | type                  | default value
 `onMouseMove`      | `func`                |
 `onMouseUp`        | `func`                |
 
-### Examples
-
-* Main ([source](https://github.com/opensource-cards/react-gesture/tree/master/examples/main))
-
 ### License
 
 MIT
