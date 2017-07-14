@@ -38,6 +38,8 @@ const propTypes = {
   onTouchMove: PropTypes.func,
   onTouchCancel: PropTypes.func,
   onTouchEnd: PropTypes.func,
+  onMouseEnter: PropTypes.func,
+  onMouseLeave: PropTypes.func,
   onMouseDown: PropTypes.func,
   onMouseMove: PropTypes.func,
   onMouseUp: PropTypes.func,
@@ -59,6 +61,8 @@ const defaultProps = {
   onTouchMove: undefined,
   onTouchCancel: undefined,
   onTouchEnd: undefined,
+  onMouseEnter: undefined,
+  onMouseLeave: undefined,
   onMouseDown: undefined,
   onMouseMove: undefined,
   onMouseUp: undefined,
@@ -86,6 +90,8 @@ export default class ReactGesture extends React.Component {
     this.onTouchEnd = this.onTouchEnd.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onHoldGesture = this.onHoldGesture.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -175,6 +181,40 @@ export default class ReactGesture extends React.Component {
       return;
     }
     this.resetState();
+  }
+
+  onMouseEnter(e) {
+    if (this.getBeginHandled()) {
+      this.setBeginHandled(false);
+      return;
+    }
+    this.setPSEmpty();
+    this.emitEvent('onMouseEnter', e);
+    this.setPSHoldTimerInitIfNeed(e);
+    this.setPSStartDateNow();
+    this.setPSPosCurrentMouseDown(e);
+    this.setPSPinch(false);
+    this.setPSSwiping(false);
+    this.setPSHold(false);
+    this.setPSTextSelection(false);
+    this.touch = false;
+  }
+
+  onMouseLeave(e) {
+    if (this.getBeginHandled()) {
+      this.setBeginHandled(false);
+      return;
+    }
+    this.setPSEmpty();
+    this.emitEvent('onMouseLeave', e);
+    this.setPSHoldTimerInitIfNeed(e);
+    this.setPSStartDateNow();
+    this.setPSPosCurrentMouseDown(e);
+    this.setPSPinch(false);
+    this.setPSSwiping(false);
+    this.setPSHold(false);
+    this.setPSTextSelection(false);
+    this.touch = false;
   }
 
   onMouseDown(e) {
@@ -485,6 +525,8 @@ export default class ReactGesture extends React.Component {
     return React.cloneElement(React.Children.only(this.props.children), {
       ref: this.onRef,
       onTouchStart: this.onTouchStart,
+      onMouseEnter: this.onMouseEnter,
+      onMouseLeave: this.onMouseLeave,
       onMouseDown: this.onMouseDown,
       onClick: this.onClick,
     });

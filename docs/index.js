@@ -37,49 +37,55 @@ const zoom = {
 ReactDOM.render(
   <ReactGesture
     onSwipeUp={() => {
-      console.log('onSwipeUp 1');
+      //console.log('onSwipeUp 1');
     }}
     onSwipeDown={() => {
-      console.log('onSwipeDown 1');
+      //console.log('onSwipeDown 1');
     }}
     onSwipeLeft={() => {
-      console.log('onSwipeLeft 1');
+      //console.log('onSwipeLeft 1');
     }}
     onSwipeRight={() => {
-      console.log('onSwipeRight 1');
+      //console.log('onSwipeRight 1');
     }}
     onTap={() => {
-      console.log('onTap 1');
+      //console.log('onTap 1');
     }}
     onTouchStart={() => {
-      // console.log('onTouchStart 1');
+      // //console.log('onTouchStart 1');
     }}
     onTouchMove={() => {
-      // console.log('onTouchMove 1');
+      // //console.log('onTouchMove 1');
     }}
     onTouchCancel={() => {
-      console.log('onTouchCancel 1');
+      //console.log('onTouchCancel 1');
     }}
     onTouchEnd={() => {
-      // console.log('onTouchEnd 1');
+      // //console.log('onTouchEnd 1');
+    }}
+    onMouseEnter={() => {
+      console.log('onMouseEnter 1');
+    }}
+    onMouseLeave={() => {
+      console.log('onMouseLeave 1');
     }}
     onMouseDown={() => {
-      // console.log('onMouseDown 1');
+      // //console.log('onMouseDown 1');
     }}
     onMouseMove={() => {
-      // console.log('onMouseMove 1');
+      // //console.log('onMouseMove 1');
     }}
     onMouseUp={() => {
-      // console.log('onMouseUp 1');
+      // //console.log('onMouseUp 1');
     }}
     onClick={() => {
-      console.log('onClick 1');
+      //console.log('onClick 1');
     }}
     onHold={() => {
-      console.log('onHold 1');
+      //console.log('onHold 1');
     }}
     onPinchToZoom={(e) => {
-      console.log('onPinchToZoom 1');
+      //console.log('onPinchToZoom 1');
       zoom.apply(e.pinch);
     }}
   >
@@ -89,49 +95,55 @@ ReactDOM.render(
       <div style={{ height: '100px', backgroundColor: BINARY_COLOR_SLATE_80 }} >
         <ReactGesture
           onSwipeUp={() => {
-            console.log('onSwipeUp 2');
+            //console.log('onSwipeUp 2');
           }}
           onSwipeDown={() => {
-            console.log('onSwipeDown 2');
+            //console.log('onSwipeDown 2');
           }}
           onSwipeLeft={() => {
-            console.log('onSwipeLeft 2');
+            //console.log('onSwipeLeft 2');
           }}
           onSwipeRight={() => {
-            console.log('onSwipeRight 2');
+            //console.log('onSwipeRight 2');
           }}
           onTap={() => {
-            console.log('onTap 2');
+            //console.log('onTap 2');
           }}
           onTouchStart={() => {
-            // console.log('onTouchStart 2');
+            // //console.log('onTouchStart 2');
           }}
           onTouchMove={() => {
-            // console.log('onTouchMove 2');
+            // //console.log('onTouchMove 2');
           }}
           onTouchCancel={() => {
-            console.log('onTouchCancel 2');
+            //console.log('onTouchCancel 2');
           }}
           onTouchEnd={() => {
-            // console.log('onTouchEnd 2');
+            // //console.log('onTouchEnd 2');
+          }}
+          onMouseEnter={() => {
+            console.log('onMouseEnter 2');
+          }}
+          onMouseLeave={() => {
+            console.log('onMouseLeave 2');
           }}
           onMouseDown={() => {
-            // console.log('onMouseDown 2');
+            console.log('onMouseDown 2');
           }}
           onMouseMove={() => {
-            // console.log('onMouseMove 2');
+            // //console.log('onMouseMove 2');
           }}
           onMouseUp={() => {
-            // console.log('onMouseUp 2');
+            // //console.log('onMouseUp 2');
           }}
           onClick={() => {
-            console.log('onClick 2');
+            //console.log('onClick 2');
           }}
           onHold={() => {
-            console.log('onHold 2');
+            //console.log('onHold 2');
           }}
           onPinchToZoom={(e) => {
-            console.log('onPinchToZoom 2');
+            //console.log('onPinchToZoom 2');
             zoom.apply(e.pinch);
           }}
         >
