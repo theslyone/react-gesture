@@ -90,49 +90,55 @@
 	  _reactGesture2.default,
 	  {
 	    onSwipeUp: function onSwipeUp() {
-	      console.log('onSwipeUp 1');
+	      //console.log('onSwipeUp 1');
 	    },
 	    onSwipeDown: function onSwipeDown() {
-	      console.log('onSwipeDown 1');
+	      //console.log('onSwipeDown 1');
 	    },
 	    onSwipeLeft: function onSwipeLeft() {
-	      console.log('onSwipeLeft 1');
+	      //console.log('onSwipeLeft 1');
 	    },
 	    onSwipeRight: function onSwipeRight() {
-	      console.log('onSwipeRight 1');
+	      //console.log('onSwipeRight 1');
 	    },
 	    onTap: function onTap() {
-	      console.log('onTap 1');
+	      //console.log('onTap 1');
 	    },
 	    onTouchStart: function onTouchStart() {
-	      // console.log('onTouchStart 1');
+	      // //console.log('onTouchStart 1');
 	    },
 	    onTouchMove: function onTouchMove() {
-	      // console.log('onTouchMove 1');
+	      // //console.log('onTouchMove 1');
 	    },
 	    onTouchCancel: function onTouchCancel() {
-	      console.log('onTouchCancel 1');
+	      //console.log('onTouchCancel 1');
 	    },
 	    onTouchEnd: function onTouchEnd() {
-	      // console.log('onTouchEnd 1');
+	      // //console.log('onTouchEnd 1');
+	    },
+	    onMouseEnter: function onMouseEnter() {
+	      console.log('onMouseEnter 1');
+	    },
+	    onMouseLeave: function onMouseLeave() {
+	      console.log('onMouseLeave 1');
 	    },
 	    onMouseDown: function onMouseDown() {
-	      // console.log('onMouseDown 1');
+	      // //console.log('onMouseDown 1');
 	    },
 	    onMouseMove: function onMouseMove() {
-	      // console.log('onMouseMove 1');
+	      // //console.log('onMouseMove 1');
 	    },
 	    onMouseUp: function onMouseUp() {
-	      // console.log('onMouseUp 1');
+	      // //console.log('onMouseUp 1');
 	    },
 	    onClick: function onClick() {
-	      console.log('onClick 1');
+	      //console.log('onClick 1');
 	    },
 	    onHold: function onHold() {
-	      console.log('onHold 1');
+	      //console.log('onHold 1');
 	    },
 	    onPinchToZoom: function onPinchToZoom(e) {
-	      console.log('onPinchToZoom 1');
+	      //console.log('onPinchToZoom 1');
 	      zoom.apply(e.pinch);
 	    }
 	  },
@@ -148,49 +154,55 @@
 	        _reactGesture2.default,
 	        {
 	          onSwipeUp: function onSwipeUp() {
-	            console.log('onSwipeUp 2');
+	            //console.log('onSwipeUp 2');
 	          },
 	          onSwipeDown: function onSwipeDown() {
-	            console.log('onSwipeDown 2');
+	            //console.log('onSwipeDown 2');
 	          },
 	          onSwipeLeft: function onSwipeLeft() {
-	            console.log('onSwipeLeft 2');
+	            //console.log('onSwipeLeft 2');
 	          },
 	          onSwipeRight: function onSwipeRight() {
-	            console.log('onSwipeRight 2');
+	            //console.log('onSwipeRight 2');
 	          },
 	          onTap: function onTap() {
-	            console.log('onTap 2');
+	            //console.log('onTap 2');
 	          },
 	          onTouchStart: function onTouchStart() {
-	            // console.log('onTouchStart 2');
+	            // //console.log('onTouchStart 2');
 	          },
 	          onTouchMove: function onTouchMove() {
-	            // console.log('onTouchMove 2');
+	            // //console.log('onTouchMove 2');
 	          },
 	          onTouchCancel: function onTouchCancel() {
-	            console.log('onTouchCancel 2');
+	            //console.log('onTouchCancel 2');
 	          },
 	          onTouchEnd: function onTouchEnd() {
-	            // console.log('onTouchEnd 2');
+	            // //console.log('onTouchEnd 2');
+	          },
+	          onMouseEnter: function onMouseEnter() {
+	            console.log('onMouseEnter 2');
+	          },
+	          onMouseLeave: function onMouseLeave() {
+	            console.log('onMouseLeave 2');
 	          },
 	          onMouseDown: function onMouseDown() {
-	            // console.log('onMouseDown 2');
+	            console.log('onMouseDown 2');
 	          },
 	          onMouseMove: function onMouseMove() {
-	            // console.log('onMouseMove 2');
+	            // //console.log('onMouseMove 2');
 	          },
 	          onMouseUp: function onMouseUp() {
-	            // console.log('onMouseUp 2');
+	            // //console.log('onMouseUp 2');
 	          },
 	          onClick: function onClick() {
-	            console.log('onClick 2');
+	            //console.log('onClick 2');
 	          },
 	          onHold: function onHold() {
-	            console.log('onHold 2');
+	            //console.log('onHold 2');
 	          },
 	          onPinchToZoom: function onPinchToZoom(e) {
-	            console.log('onPinchToZoom 2');
+	            //console.log('onPinchToZoom 2');
 	            zoom.apply(e.pinch);
 	          }
 	        },
@@ -22149,6 +22161,8 @@
 	  onTouchMove: _propTypes2.default.func,
 	  onTouchCancel: _propTypes2.default.func,
 	  onTouchEnd: _propTypes2.default.func,
+	  onMouseEnter: _propTypes2.default.func,
+	  onMouseLeave: _propTypes2.default.func,
 	  onMouseDown: _propTypes2.default.func,
 	  onMouseMove: _propTypes2.default.func,
 	  onMouseUp: _propTypes2.default.func
@@ -22170,6 +22184,8 @@
 	  onTouchMove: undefined,
 	  onTouchCancel: undefined,
 	  onTouchEnd: undefined,
+	  onMouseEnter: undefined,
+	  onMouseLeave: undefined,
 	  onMouseDown: undefined,
 	  onMouseMove: undefined,
 	  onMouseUp: undefined
@@ -22201,6 +22217,8 @@
 	    _this.onTouchEnd = _this.onTouchEnd.bind(_this);
 	    _this.onMouseDown = _this.onMouseDown.bind(_this);
 	    _this.onMouseMove = _this.onMouseMove.bind(_this);
+	    _this.onMouseEnter = _this.onMouseEnter.bind(_this);
+	    _this.onMouseLeave = _this.onMouseLeave.bind(_this);
 	    _this.onMouseUp = _this.onMouseUp.bind(_this);
 	    _this.onHoldGesture = _this.onHoldGesture.bind(_this);
 	    _this.onClick = _this.onClick.bind(_this);
@@ -22298,6 +22316,42 @@
 	        return;
 	      }
 	      this.resetState();
+	    }
+	  }, {
+	    key: 'onMouseEnter',
+	    value: function onMouseEnter(e) {
+	      if (this.getBeginHandled()) {
+	        this.setBeginHandled(false);
+	        return;
+	      }
+	      this.setPSEmpty();
+	      this.emitEvent('onMouseEnter', e);
+	      this.setPSHoldTimerInitIfNeed(e);
+	      this.setPSStartDateNow();
+	      this.setPSPosCurrentMouseDown(e);
+	      this.setPSPinch(false);
+	      this.setPSSwiping(false);
+	      this.setPSHold(false);
+	      this.setPSTextSelection(false);
+	      this.touch = false;
+	    }
+	  }, {
+	    key: 'onMouseLeave',
+	    value: function onMouseLeave(e) {
+	      if (this.getBeginHandled()) {
+	        this.setBeginHandled(false);
+	        return;
+	      }
+	      this.setPSEmpty();
+	      this.emitEvent('onMouseLeave', e);
+	      this.setPSHoldTimerInitIfNeed(e);
+	      this.setPSStartDateNow();
+	      this.setPSPosCurrentMouseDown(e);
+	      this.setPSPinch(false);
+	      this.setPSSwiping(false);
+	      this.setPSHold(false);
+	      this.setPSTextSelection(false);
+	      this.touch = false;
 	    }
 	  }, {
 	    key: 'onMouseDown',
@@ -22440,11 +22494,6 @@
 	      clearTimeout(this.pseudoState.holdTimer);
 	    }
 	  }, {
-	    key: 'setPSHoldTimerInit',
-	    value: function setPSHoldTimerInit(e) {
-	      this.pseudoState.holdTimer = this.getInitHoldTimer(e);
-	    }
-	  }, {
 	    key: 'setPSHoldTimerNull',
 	    value: function setPSHoldTimerNull() {
 	      this.pseudoState.holdTimer = null;
@@ -22577,7 +22626,6 @@
 	      }
 	      var swipingDirection = this.getPSSwipingDirection();
 	      if ((0, _validations.isCorrectSwipe)(swipingDirection, absX, absY)) {
-	        // TODO: make sure it is not needed
 	        // eventWithGesture.preventDefault();
 	        this.setGestureIsFlick(eventWithGesture);
 	        (0, _event.setGestureType)(eventWithGesture, swipeGestureName);
@@ -22649,6 +22697,8 @@
 	      return _react2.default.cloneElement(_react2.default.Children.only(this.props.children), {
 	        ref: this.onRef,
 	        onTouchStart: this.onTouchStart,
+	        onMouseEnter: this.onMouseEnter,
+	        onMouseLeave: this.onMouseLeave,
 	        onMouseDown: this.onMouseDown,
 	        onClick: this.onClick
 	      });
