@@ -1,6 +1,6 @@
 {
   "name": "react-gesture",
-  "version": "0.1.5",
+  "version": "0.2.5",
   "description": "A React component for defining gestures.",
   "keywords": [
     "react",
@@ -53,5 +53,8 @@
     "rimraf": "^2.5.4",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1"
+  },
+  "dependencies": {
+    "spur-events": "^0.1.8"
   }
 }

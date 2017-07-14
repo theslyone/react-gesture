@@ -17,6 +17,10 @@ import {
 } from '../utils/event';
 import * as Buttons from '../constants/buttons';
 
+var PointerEvents = require('spur-events');
+var addListener = PointerEvents.addListener;
+var removeListener = PointerEvents.removeListener;
+
 const propTypes = {
   children: PropTypes.element,
   disableClick: PropTypes.oneOfType([
@@ -36,6 +40,8 @@ const propTypes = {
   onPinchToZoom: PropTypes.func,
   onTouchStart: PropTypes.func,
   onTouchMove: PropTypes.func,
+  onTouchEnter: PropTypes.func,
+  onTouchLeave: PropTypes.func,
   onTouchCancel: PropTypes.func,
   onTouchEnd: PropTypes.func,
   onMouseEnter: PropTypes.func,
@@ -59,6 +65,8 @@ const defaultProps = {
   onPinchToZoom: undefined,
   onTouchStart: undefined,
   onTouchMove: undefined,
+  onTouchEnter: undefined,
+  onTouchLeave: undefined,
   onTouchCancel: undefined,
   onTouchEnd: undefined,
   onMouseEnter: undefined,
@@ -69,7 +77,6 @@ const defaultProps = {
 };
 
 export default class ReactGesture extends React.Component {
-
   constructor(props) {
     super(props);
     this.pseudoState = {
@@ -86,6 +93,8 @@ export default class ReactGesture extends React.Component {
     this.onRef = this.onRef.bind(this);
     this.onTouchStart = this.onTouchStart.bind(this);
     this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchEnter = this.onTouchEnter.bind(this);
+    this.onTouchLeave = this.onTouchLeave.bind(this);
     this.onTouchCancel = this.onTouchCancel.bind(this);
     this.onTouchEnd = this.onTouchEnd.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -104,6 +113,9 @@ export default class ReactGesture extends React.Component {
     window.addEventListener('touchmove', this.onTouchMove);
     window.addEventListener('touchend', this.onTouchEnd);
     window.addEventListener('touchcancel', this.onTouchCancel);
+
+    addListener(this.wrapper, 'pointerenter', this.onTouchEnter, { context: this });
+    addListener(this.wrapper, 'pointerleave', this.onTouchLeave, { context: this });
     this.wrapper.addEventListener('click', this.disableClick, true);
   }
 
@@ -113,6 +125,10 @@ export default class ReactGesture extends React.Component {
     window.removeEventListener('touchmove', this.onTouchMove);
     window.removeEventListener('touchend', this.onTouchEnd);
     window.removeEventListener('touchcancel', this.onTouchCancel);
+
+    removeListener(this.wrapper, 'pointerenter', this.onTouchEnter, { context: this });
+    removeListener(this.wrapper, 'pointerleave', this.onTouchLeave, { context: this });
+
     this.wrapper.removeEventListener('click', this.disableClick, true);
   }
 
@@ -164,6 +180,14 @@ export default class ReactGesture extends React.Component {
       this.handleSwipeGesture(eventWithGesture);
       return;
     }
+  }
+
+  onTouchEnter(e) {
+    this.emitEvent('onTouchEnter', e);
+  }
+
+  onTouchLeave(e) {
+    this.emitEvent('onTouchLeave', e);
   }
 
   onTouchCancel(e) {
